@@ -1,6 +1,5 @@
 package de.speedcube.ocsServer.sql;
 
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -13,7 +12,7 @@ import de.speedcube.ocsUtilities.security.Sha2;
 public class OCSDatabase {
 
 	public Connection connection;
-	private static final String prefix = "ocs_";
+	private static final String PREFIX = "ocs_";
 	private static final String[] requiredTables = new String[1];
 	public String host;
 	public String user;
@@ -51,17 +50,12 @@ public class OCSDatabase {
 	}
 
 	public ClientInformation getUser(String username, String password) throws SQLException {
-		PreparedStatement ps = connection.prepareStatement("SELECT * FROM users WHERE username = ?");
+		PreparedStatement ps = connection.prepareStatement("SELECT * FROM "+PREFIX+"users WHERE username = ?");
 		ps.setString(1, username);
 		ResultSet result = ps.executeQuery();
 		if (!result.next()) return null;
 		String hashed_password = "";
-		try {
-			hashed_password = Sha2.hashPassword(result.getString("password"), result.getString("salt"));
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-			return null;
-		}
+		hashed_password = Sha2.hashPassword(result.getString("password"), result.getString("salt"));
 		if (hashed_password != password) return null;
 
 		return new ClientInformation(result.getInt("id"), result.getString("username"));

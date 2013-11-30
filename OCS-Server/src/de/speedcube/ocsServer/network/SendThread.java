@@ -1,9 +1,11 @@
-package de.speedcube.ocsUtilities.network;
+package de.speedcube.ocsServer.network;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.LinkedList;
+
+import de.speedcube.ocsUtilities.packets.Packet;
 
 public class SendThread extends Thread {
 

@@ -4,11 +4,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import de.speedcube.ocsServer.autoUpdater.UpdateServerThread;
+import de.speedcube.ocsServer.network.Client;
+import de.speedcube.ocsServer.network.ReceiveThread;
+import de.speedcube.ocsServer.network.ServerThread;
 import de.speedcube.ocsServer.sql.OCSDatabase;
-import de.speedcube.ocsUtilities.network.Client;
-import de.speedcube.ocsUtilities.network.Packet;
-import de.speedcube.ocsUtilities.network.ReceiveThread;
-import de.speedcube.ocsUtilities.network.ServerThread;
+import de.speedcube.ocsUtilities.packets.Packet;
 import de.speedcube.ocsUtilities.security.RandomString;
 import de.speedcube.ocsUtilities.security.Sha2;
 

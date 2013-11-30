@@ -1,9 +1,12 @@
-package de.speedcube.ocsUtilities.network;
+package de.speedcube.ocsServer.network;
 
 import java.io.DataInputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
+
+import de.speedcube.ocsUtilities.packets.Packet;
+import de.speedcube.ocsUtilities.packets.PacketConnectionInfo;
 
 public class ReceiveThread extends Thread {
 	private Socket socket;

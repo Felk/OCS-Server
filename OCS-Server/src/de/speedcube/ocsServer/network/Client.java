@@ -1,10 +1,12 @@
-package de.speedcube.ocsUtilities.network;
+package de.speedcube.ocsServer.network;
 
 import java.net.*;
 import java.util.ArrayList;
 
 import de.speedcube.ocsServer.ClientInformation;
 import de.speedcube.ocsServer.OCSServer;
+import de.speedcube.ocsUtilities.packets.Packet;
+import de.speedcube.ocsUtilities.packets.PacketConnectionInfo;
 
 
 public class Client {

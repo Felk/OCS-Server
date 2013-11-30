@@ -2,12 +2,12 @@ package de.speedcube.ocsServer;
 
 import java.sql.SQLException;
 
-import de.speedcube.ocsUtilities.network.Client;
-import de.speedcube.ocsUtilities.network.Packet;
-import de.speedcube.ocsUtilities.network.PacketChat;
-import de.speedcube.ocsUtilities.network.PacketChatBroadcast;
-import de.speedcube.ocsUtilities.network.PacketLogin;
-import de.speedcube.ocsUtilities.network.PacketLoginFailed;
+import de.speedcube.ocsServer.network.Client;
+import de.speedcube.ocsUtilities.packets.Packet;
+import de.speedcube.ocsUtilities.packets.PacketChat;
+import de.speedcube.ocsUtilities.packets.PacketChatBroadcast;
+import de.speedcube.ocsUtilities.packets.PacketLogin;
+import de.speedcube.ocsUtilities.packets.PacketLoginFailed;
 
 public class PacketHandler {
 
