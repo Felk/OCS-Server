@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import de.speedcube.ocsServer.ClientInformation;
-import de.speedcube.ocsServer.security.Sha2;
+import de.speedcube.ocsUtilities.security.Sha2;
 
 public class OCSDatabase {
 

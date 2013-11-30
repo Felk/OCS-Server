@@ -1,10 +1,10 @@
-package de.speedcube.ocsServer.network;
+package de.speedcube.ocsUtilities.network;
 
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 
-import de.speedcube.ocsServer.security.RandomString;
+import de.speedcube.ocsUtilities.security.RandomString;
 
 public class ServerThread extends Thread {
 

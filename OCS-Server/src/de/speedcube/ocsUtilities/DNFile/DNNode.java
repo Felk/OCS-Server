@@ -1,4 +1,4 @@
-package de.speedcube.ocsServer.DNFile;
+package de.speedcube.ocsUtilities.DNFile;
 
 public class DNNode {
 	public String name;

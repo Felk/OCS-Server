@@ -1,6 +1,6 @@
-package de.speedcube.ocsServer.network;
+package de.speedcube.ocsUtilities.network;
 
-import de.speedcube.ocsServer.DNFile.DNFile;
+import de.speedcube.ocsUtilities.DNFile.DNFile;
 
 public class PacketLoginFailed extends Packet {
 	public String msg;

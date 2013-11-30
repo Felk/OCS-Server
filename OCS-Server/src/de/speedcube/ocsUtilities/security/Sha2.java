@@ -1,4 +1,4 @@
-package de.speedcube.ocsServer.security;
+package de.speedcube.ocsUtilities.security;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -6,8 +6,15 @@ import java.security.NoSuchAlgorithmException;
 
 public class Sha2 {
 	
-	public static String hash(String data) throws NoSuchAlgorithmException {
-		MessageDigest md = MessageDigest.getInstance("SHA-256");
+	public static String hash(String data) {
+		MessageDigest md;
+		try {
+			md = MessageDigest.getInstance("SHA-256");
+		} catch (NoSuchAlgorithmException e) {
+			System.out.println("MISSING HASH ALGORITHM SHA-256 !!!");
+			e.printStackTrace();
+			return "";
+		}
 		md.update(data.getBytes());
 		return bytesToHex(md.digest());
 	}
@@ -19,7 +26,7 @@ public class Sha2 {
 		return result.toString();
 	}
 	
-	public static String hashPassword(String password, String salt) throws NoSuchAlgorithmException {
+	public static String hashPassword(String password, String salt) {
 		return hash(salt+password);
 	}
 }

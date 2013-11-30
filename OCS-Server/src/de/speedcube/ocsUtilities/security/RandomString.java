@@ -1,4 +1,4 @@
-package de.speedcube.ocsServer.security;
+package de.speedcube.ocsUtilities.security;
 
 import java.util.Random;
 

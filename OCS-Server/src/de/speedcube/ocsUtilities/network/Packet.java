@@ -1,9 +1,9 @@
-package de.speedcube.ocsServer.network;
+package de.speedcube.ocsUtilities.network;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import de.speedcube.ocsServer.DNFile.DNFile;
+import de.speedcube.ocsUtilities.DNFile.DNFile;
 
 public abstract class Packet {
 

@@ -1,7 +1,7 @@
-package de.speedcube.ocsServer.network;
+package de.speedcube.ocsUtilities.network;
 
 import de.speedcube.ocsServer.OCSServer;
-import de.speedcube.ocsServer.DNFile.DNFile;
+import de.speedcube.ocsUtilities.DNFile.DNFile;
 
 public class PacketConnectionInfo extends Packet {
 	public String version;

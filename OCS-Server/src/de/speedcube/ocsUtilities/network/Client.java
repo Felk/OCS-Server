@@ -1,4 +1,4 @@
-package de.speedcube.ocsServer.network;
+package de.speedcube.ocsUtilities.network;
 
 import java.net.*;
 import java.util.ArrayList;

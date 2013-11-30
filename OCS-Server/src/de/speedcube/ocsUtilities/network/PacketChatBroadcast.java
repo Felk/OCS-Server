@@ -1,14 +1,16 @@
-package de.speedcube.ocsServer.network;
+package de.speedcube.ocsUtilities.network;
 
-import de.speedcube.ocsServer.DNFile.DNFile;
+import de.speedcube.ocsUtilities.DNFile.DNFile;
 
-public class PacketChat extends Packet {
+public class PacketChatBroadcast extends Packet {
 	public String text;
+	public int userId;
 
 	@Override
 	public void pack() {
 		data = new DNFile("");
 		data.addNode("text", text);
+		data.addNode("id", userId);
 		packedData = data.toByteArray();
 	}
 
@@ -17,11 +19,12 @@ public class PacketChat extends Packet {
 		data = new DNFile("");
 		data.fromByteArray(packedData);
 		text = data.getString("text");
+		userId = data.getInt("id");
 	}
 
 	@Override
 	public String getName() {
-		return "Chat";
+		return "ChatBroadcast";
 	}
 
 }

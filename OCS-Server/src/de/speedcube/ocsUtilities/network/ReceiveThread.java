@@ -1,4 +1,4 @@
-package de.speedcube.ocsServer.network;
+package de.speedcube.ocsUtilities.network;
 
 import java.io.DataInputStream;
 import java.net.Socket;
