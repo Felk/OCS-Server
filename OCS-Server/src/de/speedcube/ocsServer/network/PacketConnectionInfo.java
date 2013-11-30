@@ -5,6 +5,7 @@ import de.speedcube.ocsServer.DNFile.DNFile;
 
 public class PacketConnectionInfo extends Packet {
 	public String version;
+	public String salt = "";
 
 	@Override
 	public void pack() {
@@ -12,6 +13,7 @@ public class PacketConnectionInfo extends Packet {
 		version = OCSServer.version;
 
 		data.addNode("version", version);
+		data.addNode("salt", salt);
 
 		packedData = data.toByteArray();
 	}
@@ -22,6 +24,7 @@ public class PacketConnectionInfo extends Packet {
 		data.fromByteArray(packedData);
 
 		version = data.getString("version");
+		salt = data.getString("salt");
 	}
 
 	@Override

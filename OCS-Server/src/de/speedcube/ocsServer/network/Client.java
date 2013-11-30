@@ -22,6 +22,7 @@ public class Client {
 	public boolean connectionInfoSent = false;
 	private Object receiveNotify;
 	public ClientInformation clientInformation = null;
+	public String salt;
 	
 	public String closeMessage = "";
 
@@ -87,5 +88,9 @@ public class Client {
 		if (clientType == SERVER_CLIENT) {
 			server.removeClient(this);
 		}
+	}
+	
+	public boolean isValid() {
+		return clientInformation != null;
 	}
 }

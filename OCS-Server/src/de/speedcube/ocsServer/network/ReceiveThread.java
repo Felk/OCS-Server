@@ -63,20 +63,16 @@ public class ReceiveThread extends Thread {
 
 	public ArrayList<Packet> getData(int channel) {
 		synchronized (data) {
-			if (data.size() > 0) {
-				ArrayList<Packet> returnList = new ArrayList<Packet>();
-				for (int i = 0; i < data.size(); i++) {
-					if (data.get(i).channel == channel) {
-						returnList.add(data.get(i));
-						data.remove(i);
-						i--;
-					}
+			ArrayList<Packet> returnList = new ArrayList<Packet>();
+			for (int i = 0; i < data.size(); i++) {
+				if (data.get(i).channel == channel) {
+					returnList.add(data.get(i));
+					data.remove(i);
+					i--;
 				}
-				return returnList;
 			}
+			return returnList;
 		}
-
-		return null;
 	}
 
 	public void stopThread() {

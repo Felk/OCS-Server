@@ -65,7 +65,8 @@ public abstract class Packet {
 		registerPacket(PacketConnectionInfo.class, 0);//has to be at position 0
 		
 		registerPacket(PacketLogin.class, 1);
-		registerPacket(PacketChat.class, 2);
-		registerPacket(PacketChatBroadcast.class, 3);
+		registerPacket(PacketLoginFailed.class, 2);
+		registerPacket(PacketChat.class, 10);
+		registerPacket(PacketChatBroadcast.class, 11);
 	}
 }

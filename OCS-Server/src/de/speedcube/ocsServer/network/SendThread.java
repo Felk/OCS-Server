@@ -45,7 +45,7 @@ public class SendThread extends Thread {
 							byte[] buffer = packet.networkBuffer;
 							out.write(buffer);
 							out.flush();
-							//if (GameOptions.instance.getBoolOption("showNetworkTraffic")) System.out.println("sent packet: " + packet.getName() + " (" + (buffer.length - 8) + " bytes)");
+							//System.out.println("sent packet: " + packet.getName() + " (" + (buffer.length - 8) + " bytes)");
 						}
 					}
 				}

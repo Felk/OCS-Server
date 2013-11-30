@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 
+import de.speedcube.ocsServer.security.RandomString;
+
 public class ServerThread extends Thread {
 
 	private ArrayList<Client> clients = new ArrayList<Client>();
@@ -35,6 +37,8 @@ public class ServerThread extends Thread {
 				clients.add(newClient);
 
 				PacketConnectionInfo packetConnectionInfo = new PacketConnectionInfo();
+				newClient.salt = RandomString.getNew(20);
+				packetConnectionInfo.salt = newClient.salt;
 				newClient.connectionInfoSent = true;
 				newClient.sendPacket(packetConnectionInfo);
 
