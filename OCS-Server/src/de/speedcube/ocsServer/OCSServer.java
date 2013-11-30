@@ -31,7 +31,7 @@ public class OCSServer {
 	private void start() {
 
 		serverThread = new ServerThread(34543, packageReceiveNotify);
-		UpdateServerThread serverThread = new UpdateServerThread();
+		UpdateServerThread updateServerThread = new UpdateServerThread();
 		SQLtest();
 
 		while (running) {
