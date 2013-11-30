@@ -33,7 +33,10 @@ public class UpdateClient extends Thread {
 				out.write(serverVersion.getBytes());
 
 				sendInt(out, clientFile.length);
+				System.out.println("size: " + clientFile.length);
+				System.out.println("1");
 				out.write(clientFile);
+				System.out.println("2");
 
 				out.flush();
 			} else {
@@ -65,9 +68,9 @@ public class UpdateClient extends Thread {
 
 	public void sendInt(BufferedOutputStream out, int i) {
 		try {
-			out.write((i & 0xff000000) >> 24);
-			out.write((i & 0xff0000) >> 16);
-			out.write((i & 0xff00) >> 8);
+			out.write((i & 0xff000000) >>> 24);
+			out.write((i & 0xff0000) >>> 16);
+			out.write((i & 0xff00) >>> 8);
 			out.write(i & 0xff);
 		} catch (IOException e) {
 			e.printStackTrace();
