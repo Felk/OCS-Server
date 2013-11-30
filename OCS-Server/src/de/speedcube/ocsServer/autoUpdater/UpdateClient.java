@@ -34,9 +34,7 @@ public class UpdateClient extends Thread {
 
 				sendInt(out, clientFile.length);
 				System.out.println("size: " + clientFile.length);
-				System.out.println("1");
 				out.write(clientFile);
-				System.out.println("2");
 
 				out.flush();
 			} else {

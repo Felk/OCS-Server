@@ -1,18 +1,16 @@
 package de.speedcube.ocsServer.network;
 
-import de.speedcube.ocsServer.OCSServer;
 import de.speedcube.ocsServer.DNFile.DNFile;
 
-public class PacketConnectionInfo extends Packet {
-	public String version;
+public class PacketChatBroadcast extends Packet {
+	public String text;
+	public int userId;
 
 	@Override
 	public void pack() {
 		data = new DNFile("");
-		version = OCSServer.version;
-
-		data.addNode("version", version);
-
+		data.addNode("text", text);
+		data.addNode("id", userId);
 		packedData = data.toByteArray();
 	}
 
@@ -20,13 +18,13 @@ public class PacketConnectionInfo extends Packet {
 	public void unpack() {
 		data = new DNFile("");
 		data.fromByteArray(packedData);
-
-		version = data.getString("version");
+		text = data.getString("text");
+		userId = data.getInt("id");
 	}
 
 	@Override
 	public String getName() {
-		return "ConnectionInfo";
+		return "ChatBroadcast";
 	}
 
 }

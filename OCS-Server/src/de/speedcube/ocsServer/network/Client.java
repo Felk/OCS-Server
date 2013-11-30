@@ -3,6 +3,7 @@ package de.speedcube.ocsServer.network;
 import java.net.*;
 import java.util.ArrayList;
 
+import de.speedcube.ocsServer.ClientInformation;
 import de.speedcube.ocsServer.OCSServer;
 
 
@@ -20,6 +21,7 @@ public class Client {
 	public boolean connectionInfoReceived = false;
 	public boolean connectionInfoSent = false;
 	private Object receiveNotify;
+	public ClientInformation clientInformation = null;
 	
 	public String closeMessage = "";
 

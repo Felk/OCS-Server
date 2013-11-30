@@ -62,9 +62,11 @@ public class OCSServer {
 				for (Client c : serverThread.getClients()) {
 					packets.addAll(c.getData(Packet.DEFAULT_CHANNEL));
 					packets.addAll(c.getData(Packet.CHAT_CHANNEL));
+					for (Packet p : packets) {
+						PacketHandler.handlePackage(this, c, p);
+					}
+					packets.clear();
 				}
-				
-				
 				
 				System.out.println("Package verfügbar!");
 			} catch (InterruptedException e) {
