@@ -48,7 +48,9 @@ public class ReceiveThread extends Thread {
 				} else {
 					synchronized (data) {
 						data.add(receivedPacket);
-						if (toNotify != null) toNotify.notify();
+						if (toNotify != null) synchronized (toNotify) {
+							toNotify.notify();
+						}
 					}
 				}
 			}

@@ -1,20 +1,24 @@
 package de.speedcube.ocsServer;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import de.speedcube.ocsServer.autoUpdater.UpdateServerThread;
+import de.speedcube.ocsServer.network.Client;
+import de.speedcube.ocsServer.network.Packet;
 import de.speedcube.ocsServer.network.ReceiveThread;
 import de.speedcube.ocsServer.network.ServerThread;
+import de.speedcube.ocsServer.sql.OCSDatabase;
 
 public class OCSServer {
 
 	public static final String version = "0";
-	public boolean running = true;
+	public boolean running;
 	public ServerThread serverThread;
+	public UpdateServerThread updateServerThread;
 	public ReceiveThread receiveThread;
 	public static Object packageReceiveNotify = new Object();
+	public OCSDatabase database = null;
 
 	public OCSServer() {
 
@@ -26,50 +30,53 @@ public class OCSServer {
 		OCSServer server = new OCSServer();
 		server.start();
 
+		System.out.println("Terminating!");
+		
 	}
 
 	private void start() {
 
+		running = true;
+		
 		serverThread = new ServerThread(34543, packageReceiveNotify);
-		UpdateServerThread updateServerThread = new UpdateServerThread();
-		SQLtest();
+		updateServerThread = new UpdateServerThread();
 
+		try {
+			database = new OCSDatabase("localhost", "Felk", "ruamzuzla", "jocs");
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+			System.out.println("Could not make a database connection! Aborting programm.");
+			running = false;
+		}
+
+		System.out.println("Starting Mainloop:.");
+		
 		while (running) {
 
 			try {
-				packageReceiveNotify.wait();
+				synchronized (packageReceiveNotify) {
+					packageReceiveNotify.wait();
+				}
+				
+				ArrayList<Packet> packets = new ArrayList<Packet>();
+				for (Client c : serverThread.getClients()) {
+					packets.addAll(c.getData(Packet.DEFAULT_CHANNEL));
+					packets.addAll(c.getData(Packet.CHAT_CHANNEL));
+				}
+				
+				
+				
 				System.out.println("Package verfügbar!");
 			} catch (InterruptedException e) {
 				running = false;
 				e.printStackTrace();
 			}
-			//System.out.println("ok");
-			//serverThread.getClients().get(0).g
 
 		}
 
+		System.out.println("Stopped mainloop");
 		serverThread.stopServer();
-
-	}
-
-	public void SQLtest() {
-
-		try {
-			// Der Aufruf von newInstance() ist ein Workaround
-			// für einige misslungene Java-Implementierungen
-
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-		} catch (Exception ex) {
-			// Fehler behandeln
-		}
-
-		try {
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/jocs", "Felk", "ruamzuzla");
-			con.createStatement();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		updateServerThread.stopServer();
 
 	}
 

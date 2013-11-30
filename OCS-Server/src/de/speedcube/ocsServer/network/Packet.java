@@ -15,12 +15,7 @@ public abstract class Packet {
 	public boolean packed = false;
 
 	public static final int DEFAULT_CHANNEL = 0;
-	public static final int LOBBY_CHANNEL = 1;
-	public static final int WORLD_CHANNEL = 2;
-	public static final int PLAYER_CHANNEL = 3;
-	public static final int ENTITY_CHANNEL = 3;
-
-	private static int biggestID = 0; //0 is reserved for PacketConnectionInfo
+	public static final int CHAT_CHANNEL = 1;
 
 	protected static ArrayList<Class<? extends Packet>> packets = new ArrayList<Class<? extends Packet>>();
 	protected static HashMap<Class<? extends Packet>, Integer> packetIdMap = new HashMap<Class<? extends Packet>, Integer>();
@@ -61,14 +56,12 @@ public abstract class Packet {
 
 	public abstract String getName();
 
-	private static void registerPacket(Class<? extends Packet> packet) {
-		packetIdMap.put(packet, biggestID);
-
+	private static void registerPacket(Class<? extends Packet> packet, int id) {
+		packetIdMap.put(packet, id);
 		packets.add(packet);
-		biggestID++;
 	}
 
 	static {
-		registerPacket(PacketConnectionInfo.class);//has to be at position 0
+		registerPacket(PacketConnectionInfo.class, 0);//has to be at position 0
 	}
 }

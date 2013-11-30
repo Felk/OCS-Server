@@ -8,6 +8,7 @@ public class UpdateServerThread extends Thread {
 
 	private ServerSocket serverSocket;
 	private ArrayList<UpdateClient> clients;
+	private boolean running;
 
 	public UpdateServerThread() {
 		try {
@@ -21,13 +22,29 @@ public class UpdateServerThread extends Thread {
 
 	@Override
 	public void run() {
-		boolean running = true;
+		running = true;
 		while (running) {
 			try {
 				clients.add(new UpdateClient(serverSocket.accept()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	public void stopServer() {
+		running = false;
+		synchronized (clients) {
+			while (clients.size() > 0) {
+				clients.get(0).stopClient();
+			}
+		}
+
+		try {
+			serverSocket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Could not stop UpdateServerThread");
 		}
 	}
 }

@@ -93,4 +93,13 @@ public class UpdateClient extends Thread {
 		}
 		return new byte[0];
 	}
+	
+	public void stopClient() {
+		try {
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Could not close socket for UpdateClient.");
+		}
+	}
 }
