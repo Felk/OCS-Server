@@ -10,10 +10,12 @@ public class ServerThread extends Thread {
 	private ServerSocket serverSocket;
 	public int port;
 	private boolean running = true;
+	private Object receiveNotify;
 
-	public ServerThread(int port) {
+	public ServerThread(int port, Object receiveNotify) {
 		setName("ServerThread");
 		this.port = port;
+		this.receiveNotify = receiveNotify;
 		try {
 			serverSocket = new ServerSocket(port);
 		} catch (IOException e) {
@@ -29,7 +31,7 @@ public class ServerThread extends Thread {
 		try {
 			while (running) {
 				Socket newClientSocket = serverSocket.accept();
-				Client newClient = new Client(newClientSocket, this);
+				Client newClient = new Client(newClientSocket, this, receiveNotify);
 				clients.add(newClient);
 
 				PacketConnectionInfo packetConnectionInfo = new PacketConnectionInfo();

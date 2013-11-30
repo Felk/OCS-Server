@@ -19,12 +19,14 @@ public class Client {
 	public PacketConnectionInfo connectionInfo;
 	public boolean connectionInfoReceived = false;
 	public boolean connectionInfoSent = false;
-
+	private Object receiveNotify;
+	
 	public String closeMessage = "";
 
-	public Client(Socket socket, ServerThread server) {
+	public Client(Socket socket, ServerThread server, Object receiveNotify) {
 		this.socket = socket;
 		this.server = server;
+		this.receiveNotify = receiveNotify;
 		connected = true;
 		clientType = SERVER_CLIENT;
 		init();
@@ -42,7 +44,7 @@ public class Client {
 
 	public void init() {
 		sender = new SendThread(socket);
-		receiver = new ReceiveThread(socket, this);
+		receiver = new ReceiveThread(socket, this, receiveNotify);
 
 		sender.start();
 		receiver.start();

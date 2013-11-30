@@ -8,13 +8,15 @@ import java.util.LinkedList;
 public class ReceiveThread extends Thread {
 	private Socket socket;
 	private Client client;
+	private Object toNotify;
 	private boolean connectionClosed = false;
 	private LinkedList<Packet> data = new LinkedList<Packet>();
 
-	public ReceiveThread(Socket socket, Client client) {
+	public ReceiveThread(Socket socket, Client client, Object toNotify) {
 		setName("ReceiveThread");
 		this.socket = socket;
 		this.client = client;
+		this.toNotify = toNotify;
 	}
 
 	@Override
@@ -37,16 +39,16 @@ public class ReceiveThread extends Thread {
 				}
 
 				Packet receivedPacket = Packet.getPacket(packetID).newInstance();
-				//if (GameOptions.instance.getBoolOption("showNetworkTraffic")) System.out.println("received packet: " + receivedPacket.getName() + " (" + receivedBytes + "/" + buffer.length + " bytes)");
 				receivedPacket.packedData = buffer;
 				receivedPacket.unpack();
 
-				//hardcoded PacketID for connectionData (0)
+				// hardcoded PacketID for connectionData (0)
 				if (!client.connectionInfoReceived && packetID == 0) {
 					client.setConnectionInfo((PacketConnectionInfo) receivedPacket);
 				} else {
 					synchronized (data) {
 						data.add(receivedPacket);
+						if (toNotify != null) toNotify.notify();
 					}
 				}
 			}

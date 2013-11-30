@@ -33,8 +33,4 @@ public class PacketConnectionInfo extends Packet {
 		return "ConnectionInfo";
 	}
 
-	@Override
-	public int getPacketId() {
-		return 0;
-	}
 }
