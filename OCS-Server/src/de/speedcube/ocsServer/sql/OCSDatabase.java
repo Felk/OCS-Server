@@ -73,7 +73,7 @@ public class OCSDatabase {
 	}
 	
 	public String getTransmissionSalt(String username) throws SQLException {
-		PreparedStatement ps = connection.prepareStatement("SELECT transmission_salt FROM "+PREFIX+" WHERE username = ? LIMIT 1");
+		PreparedStatement ps = connection.prepareStatement("SELECT transmission_salt FROM "+PREFIX+"users WHERE username = ? LIMIT 1");
 		ps.setString(1, username);
 		ResultSet result = ps.executeQuery();
 		if (!result.next()) return "";
