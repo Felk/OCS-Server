@@ -10,6 +10,7 @@ import de.speedcube.ocsUtilities.packets.PacketLoginUsername;
 import de.speedcube.ocsUtilities.packets.PacketLoginFailed;
 import de.speedcube.ocsUtilities.packets.PacketLoginPassword;
 import de.speedcube.ocsUtilities.packets.PacketLoginSalt;
+import de.speedcube.ocsUtilities.packets.PacketUserlist;
 
 public class PacketHandler {
 
@@ -30,7 +31,7 @@ public class PacketHandler {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			System.out.println("Could not handle package "+p.getName()+" due to database errors.");
+			System.out.println("Could not handle package " + p.getName() + " due to database errors.");
 		}
 
 		System.out.println("Packet not handled: " + p.getName());
@@ -38,23 +39,43 @@ public class PacketHandler {
 	}
 
 	public static void handleLoginNamePacket(OCSServer server, Client client, PacketLoginUsername packet) throws SQLException {
+
 		String salt = "";
 		salt = server.database.getTransmissionSalt(packet.username);
+
 		PacketLoginSalt packetSalt = new PacketLoginSalt();
 		packetSalt.salt = salt;
 		client.sendPacket(packetSalt);
+
 		client.username = packet.username;
+
 	}
 
 	public static void handleLoginPasswordPacket(OCSServer server, Client client, PacketLoginPassword packet) throws SQLException {
+
 		System.out.println("Got login attempt.");
 		client.clientInformation = server.database.getUser(client.username, packet.password);
 
 		if (client.isAuthorized()) {
+			// SUCCESSFULL LOGIN
 			PacketLoginUsername packetUsername = new PacketLoginUsername();
 			packetUsername.username = client.clientInformation.username;
 			client.sendPacket(packetUsername);
+
+			PacketUserlist packetUserlist = new PacketUserlist();
+			int clients_num = server.serverThread.getClients().size();
+			int[] userIds = new int[clients_num];
+			String[] usernames = new String[clients_num];
+			for (int i = 0; i < clients_num; i++) {
+				userIds[i] = server.serverThread.getClients().get(i).clientInformation.userId;
+				usernames[i] = server.serverThread.getClients().get(i).clientInformation.username;
+			}
+			packetUserlist.userIds = userIds;
+			packetUserlist.usernames = usernames;
+			client.sendPacket(packetUserlist);
+
 			System.out.println("LOGIN SUCCESSFULL FOR: " + client.clientInformation.username);
+
 		} else {
 			PacketLoginFailed packetFailed = new PacketLoginFailed();
 			packetFailed.msg = "Failed to log in!";
