@@ -4,9 +4,9 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 
+import de.speedcube.ocsServer.OCSServer;
 import de.speedcube.ocsUtilities.packets.Packet;
 import de.speedcube.ocsUtilities.packets.PacketConnectionInfo;
-import de.speedcube.ocsUtilities.security.RandomString;
 
 public class ServerThread extends Thread {
 
@@ -39,8 +39,7 @@ public class ServerThread extends Thread {
 				clients.add(newClient);
 
 				PacketConnectionInfo packetConnectionInfo = new PacketConnectionInfo();
-				newClient.salt = RandomString.getNew(20);
-				packetConnectionInfo.salt = newClient.salt;
+				packetConnectionInfo.version = OCSServer.version;
 				newClient.connectionInfoSent = true;
 				newClient.sendPacket(packetConnectionInfo);
 

@@ -37,7 +37,7 @@ public class OCSDatabase {
 		for (String table : requiredTables) {
 			PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = ? AND table_name = ?;");
 			ps.setString(1, database);
-			ps.setString(2, table);
+			ps.setString(2, PREFIX+table);
 			ResultSet result = ps.executeQuery();
 			result.next();
 			if (result.getInt(1) != 1) {
@@ -50,15 +50,34 @@ public class OCSDatabase {
 	}
 
 	public ClientInformation getUser(String username, String password) throws SQLException {
-		PreparedStatement ps = connection.prepareStatement("SELECT * FROM "+PREFIX+"users WHERE username = ?");
+		PreparedStatement ps = connection.prepareStatement("SELECT * FROM " + PREFIX + "users WHERE username = ? LIMIT 1");
+		System.out.println("USER: " + username);
+		System.out.println("PASS: " + password);
 		ps.setString(1, username);
 		ResultSet result = ps.executeQuery();
-		if (!result.next()) return null;
-		String hashed_password = "";
-		hashed_password = Sha2.hashPassword(result.getString("password"), result.getString("salt"));
-		if (hashed_password != password) return null;
+		
+		if (!result.next()) return null; // No valid user authentification
+		
+		String salt = result.getString("salt");
+		
+		String hashed_password = Sha2.hashPassword(password, salt);
+		
+		String original_password = result.getString("password");
+		
+		System.out.println("HASHED: "+hashed_password);
+		System.out.println("IN DB:  "+original_password);
+		
+		if (!hashed_password.equals(original_password)) return null;
 
 		return new ClientInformation(result.getInt("id"), result.getString("username"));
+	}
+	
+	public String getTransmissionSalt(String username) throws SQLException {
+		PreparedStatement ps = connection.prepareStatement("SELECT transmission_salt FROM "+PREFIX+" WHERE username = ? LIMIT 1");
+		ps.setString(1, username);
+		ResultSet result = ps.executeQuery();
+		if (!result.next()) return "";
+		return result.getString(1);
 	}
 
 	static {

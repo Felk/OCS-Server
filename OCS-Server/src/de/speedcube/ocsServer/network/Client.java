@@ -24,7 +24,7 @@ public class Client {
 	public boolean connectionInfoSent = false;
 	private Object receiveNotify;
 	public ClientInformation clientInformation = null;
-	public String salt;
+	public String username;
 	
 	public String closeMessage = "";
 
@@ -92,7 +92,7 @@ public class Client {
 		}
 	}
 	
-	public boolean isValid() {
-		return clientInformation != null;
+	public boolean isAuthorized() {
+		return (clientInformation != null);
 	}
 }
