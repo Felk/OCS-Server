@@ -35,6 +35,9 @@ public class OCSServer {
 
 	private void start() {
 
+		//String salt1 = RandomString.getNew(20); System.out.println(salt1);
+		//String salt2 = RandomString.getNew(20); System.out.println(salt2);
+		//System.out.println(Sha2.hashPassword(Sha2.hashPassword("14", salt1), salt2));
 		//System.out.println(Sha2.hashPassword(Sha2.hashPassword("42", "UkyKiTw;Hje.;@kNwKPL"), "$xccyy^>ef21an-5fUF="));
 		
 		running = true;

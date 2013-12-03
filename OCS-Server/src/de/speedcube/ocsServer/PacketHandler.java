@@ -1,6 +1,8 @@
 package de.speedcube.ocsServer;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsUtilities.packets.Packet;
@@ -63,16 +65,16 @@ public class PacketHandler {
 			client.sendPacket(packetUsername);
 
 			PacketUserlist packetUserlist = new PacketUserlist();
-			int clients_num = server.serverThread.getClients().size();
-			int[] userIds = new int[clients_num];
-			String[] usernames = new String[clients_num];
-			for (int i = 0; i < clients_num; i++) {
-				userIds[i] = server.serverThread.getClients().get(i).clientInformation.userId;
-				usernames[i] = server.serverThread.getClients().get(i).clientInformation.username;
+			ArrayList<Integer> userIds = new ArrayList<Integer>();
+			ArrayList<String> usernames = new ArrayList<String>();
+			for (int i = 0; i < server.serverThread.getClients().size(); i++) {
+				if (!server.serverThread.getClients().get(i).isAuthorized()) continue;
+				userIds.add(server.serverThread.getClients().get(i).clientInformation.userId);
+				usernames.add(server.serverThread.getClients().get(i).clientInformation.username);
 			}
-			packetUserlist.userIds = userIds;
-			packetUserlist.usernames = usernames;
-			client.sendPacket(packetUserlist);
+			packetUserlist.userIds = toPrimitives(userIds);
+			packetUserlist.usernames = (String[]) usernames.toArray(new String[usernames.size()]);
+			server.serverThread.broadcastData(packetUserlist);
 
 			System.out.println("LOGIN SUCCESSFULL FOR: " + client.clientInformation.username);
 
@@ -92,7 +94,15 @@ public class PacketHandler {
 		else
 			broadcast.userId = 0;
 		server.serverThread.broadcastData(broadcast);
-		//System.out.println("broadcasted Chat message");
+	}
+
+	public static int[] toPrimitives(ArrayList<Integer> integers) {
+		int[] ret = new int[integers.size()];
+		Iterator<Integer> iterator = integers.iterator();
+		for (int i = 0; i < ret.length; i++) {
+			ret[i] = iterator.next().intValue();
+		}
+		return ret;
 	}
 
 }
