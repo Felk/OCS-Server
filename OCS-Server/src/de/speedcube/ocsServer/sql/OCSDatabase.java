@@ -56,7 +56,7 @@ public class OCSDatabase {
 		ps.setString(1, username);
 		ResultSet result = ps.executeQuery();
 		
-		if (!result.next()) return null; // No valid user authentification
+		if (!result.next()) return new ClientInformation(); // No valid user authentification
 		
 		String salt = result.getString("salt");
 		
@@ -69,7 +69,7 @@ public class OCSDatabase {
 		
 		if (!hashed_password.equals(original_password)) return null;
 
-		return new ClientInformation(result.getInt("id"), result.getString("username"));
+		return new ClientInformation(result.getInt("id"), result.getString("username"), result.getInt("rank"));
 	}
 	
 	public String getTransmissionSalt(String username) throws SQLException {
