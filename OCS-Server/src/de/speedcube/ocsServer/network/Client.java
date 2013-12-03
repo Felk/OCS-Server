@@ -3,7 +3,7 @@ package de.speedcube.ocsServer.network;
 import java.net.*;
 import java.util.ArrayList;
 
-import de.speedcube.ocsServer.ClientInformation;
+import de.speedcube.ocsServer.User;
 import de.speedcube.ocsServer.OCSServer;
 import de.speedcube.ocsUtilities.packets.Packet;
 import de.speedcube.ocsUtilities.packets.PacketConnectionInfo;
@@ -23,7 +23,7 @@ public class Client {
 	public boolean connectionInfoReceived = false;
 	public boolean connectionInfoSent = false;
 	private Object receiveNotify;
-	public ClientInformation clientInformation = new ClientInformation();
+	public User user = new User(null);
 	
 	public String closeMessage = "";
 
@@ -86,6 +86,10 @@ public class Client {
 		receiver.stopThread();
 
 		sender.stopThread();
+		
+		user.remove();
+		server.broadcastData(user.userlist.toPacket());
+		
 		if (clientType == SERVER_CLIENT) {
 			server.removeClient(this);
 		}

@@ -47,7 +47,7 @@ public class SendThread extends Thread {
 							byte[] buffer = packet.networkBuffer;
 							out.write(buffer);
 							out.flush();
-							//System.out.println("sent packet: " + packet.getName() + " (" + (buffer.length - 8) + " bytes)");
+							System.out.println("sent packet: " + packet.getName() + " ID: " + packet.packetID + " (" + (buffer.length - 8) + " bytes)");
 						}
 					}
 				}

@@ -18,10 +18,11 @@ public class OCSServer {
 	public UpdateServerThread updateServerThread;
 	public ReceiveThread receiveThread;
 	public static Object packageReceiveNotify = new Object();
-	public OCSDatabase database = null;
+	public OCSDatabase database;
+	public Userlist userlist;
 
 	public OCSServer() {
-
+		userlist = new Userlist();
 	}
 
 	public static void main(String[] args) {
@@ -68,13 +69,14 @@ public class OCSServer {
 				System.out.println("Packet(s) verfügbar");
 
 				ArrayList<Packet> packets = new ArrayList<Packet>();
-				for (Client c : serverThread.getClients()) {
+				for (int i = 0; i < serverThread.getClients().size(); i++) {
+					Client c = serverThread.getClients().get(i);
 					for (Packet p : c.getData(Packet.DEFAULT_CHANNEL))
 						packets.add(p);
 					for (Packet p : c.getData(Packet.CHAT_CHANNEL))
 						packets.add(p);
 					for (Packet p : packets) {
-						System.out.println("handling packet");
+						System.out.println("handling packet: "+p.getName());
 						PacketHandler.handlePackage(this, c, p);
 					}
 					packets.clear();
