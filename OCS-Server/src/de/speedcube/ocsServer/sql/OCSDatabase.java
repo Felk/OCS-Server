@@ -68,7 +68,7 @@ public class OCSDatabase {
 
 		if (!hashed_password.equals(original_password)) return null;
 
-		return new User(null, result.getInt("id"), result.getString("username"), result.getInt("rank"));
+		return new User(null, result.getInt("id"), result.getString("username"), result.getInt("rank"), result.getInt("color"), result.getString("status"));
 	}
 
 	public boolean userExists(String username) throws SQLException {

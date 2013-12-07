@@ -17,6 +17,7 @@ import de.speedcube.ocsUtilities.packets.PacketRegistrationError;
 import de.speedcube.ocsUtilities.packets.PacketRegistrationSuccess;
 import de.speedcube.ocsUtilities.packets.PacketSalt;
 import de.speedcube.ocsUtilities.packets.PacketSaltGet;
+import de.speedcube.ocsUtilities.packets.PacketUserInfo;
 import de.speedcube.ocsUtilities.security.RandomString;
 
 public class PacketHandler {
@@ -35,7 +36,7 @@ public class PacketHandler {
 				handleRegistrationPacket(server, client, (PacketRegistration) p);
 				return;
 
-			} else if (client.user.rank >= Userranks.NORMAL) {
+			} else if (client.user.userInfo.rank >= Userranks.NORMAL) {
 				// Wenn authentifiziert
 				if (p instanceof PacketChat) {
 					handleChatPacket(server, client, (PacketChat) p);
@@ -62,19 +63,20 @@ public class PacketHandler {
 		client.sendPacket(packetSalt);
 
 		// Remember the Name, to which the client propably enters a password shortly after
-		client.user.username = packet.username;
+		System.out.println("!!!"+(client.user == null));
+		client.user.userInfo.username = packet.username;
 
 	}
 
 	public static void handleLoginPacket(OCSServer server, Client client, PacketLogin packet) throws SQLException {
 
-		System.out.println("Got login attempt.");
+		//System.out.println("Got login attempt.");
 		//client.clientInformation;
-		User user = server.database.getUser(client.user.username, packet.password);
+		User user = server.database.getUser(client.user.userInfo.username, packet.password);
 
 		if (user != null) {
 			// SUCCESSFULL LOGIN
-			User existing = server.userlist.getUser(user.username);
+			User existing = server.userlist.getUser(user.userInfo.username);
 			if (existing != null) {
 				existing.kick();
 			}
@@ -82,12 +84,24 @@ public class PacketHandler {
 			server.userlist.addUser(user, client);
 
 			PacketLoginSuccess packetSuccess = new PacketLoginSuccess();
-			packetSuccess.username = client.user.username;
+			packetSuccess.username = client.user.userInfo.username;
 			client.sendPacket(packetSuccess);
 
+			// Update userlist
 			server.serverThread.broadcastData(server.userlist.toPacket());
 
-			System.out.println("LOGIN SUCCESSFULL FOR: " + client.user.username);
+			// Update userinfo
+			PacketUserInfo pUserInfo = new PacketUserInfo();
+			pUserInfo.addUserInfo(user.userInfo);
+			server.serverThread.broadcastData(pUserInfo);
+
+			// Same for new User
+			pUserInfo = new PacketUserInfo();
+			for (User u : server.userlist.getUsers())
+				pUserInfo.addUserInfo(u.userInfo);
+			server.serverThread.broadcastData(pUserInfo);
+
+			System.out.println("LOGIN SUCCESSFULL FOR: " + client.user.userInfo.username);
 
 		} else {
 			PacketLoginError packetFailed = new PacketLoginError();
@@ -101,18 +115,28 @@ public class PacketHandler {
 		System.out.println("Got registration attempt.");
 
 		if (server.database.userExists(packet.username)) {
+
 			PacketRegistrationError packetError = new PacketRegistrationError();
 			packetError.errNr = LangAuthentification.ERR_REG_USERNAME_TAKEN;
-			System.out.println("Username existiert bereits");
-		} else if (packet.username.length() > Config.USERNAME_MAX_LENGTH || packet.username.length() < Config.USERNAME_MIN_LENGTH) {
+			client.sendPacket(packetError);
+			System.out.println("Username existiert bereits: " + packet.username);
+
+			//} else if (packet.username.length() > Config.USERNAME_MAX_LENGTH || packet.username.length() < Config.USERNAME_MIN_LENGTH) {
+		} else if (!packet.username.matches(Config.USERNAME_REGEXP)) {
+
 			PacketRegistrationError packetError = new PacketRegistrationError();
 			packetError.errNr = LangAuthentification.ERR_REG_USERNAME_INVALID;
-			System.out.println("Username zu lang/kurz");
+			client.sendPacket(packetError);
+			System.out.println("Username zu lang/kurz: " + packet.username);
+
 		} else {
+
 			server.database.register(packet.username, packet.password, packet.salt);
 			PacketRegistrationSuccess packetSuccess = new PacketRegistrationSuccess();
 			packetSuccess.username = packet.username;
-			System.out.println("Registrierung erfolgreich für: "+packet.username);
+			client.sendPacket(packetSuccess);
+			System.out.println("Registrierung erfolgreich für: " + packet.username);
+
 		}
 
 	}
@@ -120,11 +144,13 @@ public class PacketHandler {
 	public static void handleChatPacket(OCSServer server, Client client, PacketChat packet) {
 		System.out.println("Got chat message: " + packet.text);
 		PacketChatBroadcast broadcast = new PacketChatBroadcast();
+		packet.text =
 		broadcast.text = packet.text;
-		if (client.user != null)
-			broadcast.userId = client.user.userId;
-		else
-			broadcast.userId = 0;
+		//if (client.user != null) {
+		broadcast.userId = client.user.userInfo.userID;
+		broadcast.channel = packet.channel;
+		//else
+		//	broadcast.userId = 0;
 		server.serverThread.broadcastData(broadcast);
 		//System.out.println("broadcasted Chat message");
 	}

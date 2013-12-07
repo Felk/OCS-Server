@@ -1,28 +1,23 @@
 package de.speedcube.ocsServer;
 
 import de.speedcube.ocsServer.network.Client;
-import de.speedcube.ocsUtilities.Userranks;
 import de.speedcube.ocsUtilities.packets.PacketLogout;
+import de.speedcube.ocsUtilities.UserInfo;
 
 public class User {
 
 	public Userlist userlist;
-	
-	public int rank = Userranks.GUEST;
 	private Client client;
-	public int userId;
-	public String username;
 	public String salt = "";
+	public UserInfo userInfo = new UserInfo();
 	
 	public User(Client client) {
 		setClient(client);
 	}
 	
-	public User(Userlist userlist, int id, String username, int rank) {
+	public User(Userlist userlist, int id, String username, int rank, int color, String status) {
+		this.userInfo = new UserInfo(id, username, rank, color, status);
 		this.userlist = userlist;
-		this.userId = id;
-		this.username = username;
-		this.rank = rank;
 	}
 	
 	public void remove() {

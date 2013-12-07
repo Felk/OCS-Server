@@ -3,6 +3,7 @@ package de.speedcube.ocsServer;
 import java.util.ArrayList;
 
 import de.speedcube.ocsServer.network.Client;
+import de.speedcube.ocsUtilities.UserInfo;
 import de.speedcube.ocsUtilities.packets.PacketUserlist;
 
 public class Userlist {
@@ -15,7 +16,7 @@ public class Userlist {
 	
 	public User getUser(String username) {
 		for(User u: users)
-			if (u.username.equals(username)) return u;
+			if (u.userInfo.username.equals(username)) return u;
 		return null;
 	}
 	
@@ -37,17 +38,22 @@ public class Userlist {
 		int[] userIds = new int[num];
 		String[] usernames = new String[num];
 		for (int i = 0; i < num; i++) {
-			userIds[i] = users.get(i).userId;
-			usernames[i] = users.get(i).username;
+			userIds[i] = users.get(i).userInfo.userID;
+			usernames[i] = users.get(i).userInfo.username;
 		}
 		PacketUserlist p = new PacketUserlist();
 		p.userIds = userIds;
-		p.usernames = usernames;
 		return p;
 	}
 	
 	public ArrayList<User> getUsers() {
 		return users;
+	}
+	
+	public ArrayList<UserInfo> getUserInfos() {
+		ArrayList<UserInfo> infos = new ArrayList<UserInfo>();
+		for (User u : users) infos.add(u.userInfo);
+		return infos;
 	}
 	
 }
