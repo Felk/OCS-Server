@@ -1,7 +1,12 @@
 package de.speedcube.ocsServer;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import de.speedcube.ocsServer.autoUpdater.UpdateServerThread;
 import de.speedcube.ocsServer.network.Client;
@@ -44,17 +49,29 @@ public class OCSServer {
 		updateServerThread = new UpdateServerThread();
 
 		try {
-			database = new OCSDatabase("localhost", "Felk", "ruamzuzla", "jocs");
+			
+			// Load Database connection info
+			Properties properties = new Properties();
+			BufferedInputStream stream = new BufferedInputStream(new FileInputStream("dbconnection.properties"));
+			properties.load(stream);
+			stream.close();
+			
+			// Try database connection
+			database = new OCSDatabase(properties.getProperty("host"), properties.getProperty("username"), properties.getProperty("password"), properties.getProperty("database"));
+			
 			if (database.checkAllTables()) {
 				System.out.println("Alle Datenbanktabellen vorhanden!");
 			} else {
 				running = false;
 				System.out.println("ERROR: Nicht alle Datenbanktabellen vorhanden!");
 			}
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
 			System.out.println("Could not make a database connection! Aborting programm.");
 			running = false;
+		} catch (IOException e) {
+			System.out.println("Could not read connection properties file");
+			e.printStackTrace();
 		}
 
 		System.out.println("Starting Mainloop:.");

@@ -18,7 +18,7 @@ public class Client {
 	public static final int CLIENT = 0;
 	public static final int SERVER_CLIENT = 1;
 	public int clientType = CLIENT;
-	private ServerThread server;
+	public ServerThread server;
 	public PacketConnectionInfo connectionInfo;
 	public boolean connectionInfoReceived = false;
 	public boolean connectionInfoSent = false;
@@ -88,7 +88,7 @@ public class Client {
 		sender.stopThread();
 		
 		user.remove();
-		if (user != null )server.broadcastData(user.userlist.toPacket());
+		//if (user != null )server.broadcastData(user.userlist.toPacket());
 		
 		if (clientType == SERVER_CLIENT) {
 			server.removeClient(this);

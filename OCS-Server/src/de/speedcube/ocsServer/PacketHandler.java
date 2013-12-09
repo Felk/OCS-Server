@@ -2,6 +2,7 @@ package de.speedcube.ocsServer;
 
 import java.sql.SQLException;
 
+import de.speedcube.ocsServer.chat.Chat;
 import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsUtilities.Config;
 import de.speedcube.ocsUtilities.Userranks;
@@ -79,6 +80,7 @@ public class PacketHandler {
 			User existing = server.userlist.getUser(user.userInfo.username);
 			if (existing != null) {
 				existing.kick();
+				// No userlist update btw.
 			}
 
 			server.userlist.addUser(user, client);
@@ -88,18 +90,18 @@ public class PacketHandler {
 			client.sendPacket(packetSuccess);
 
 			// Update userlist
-			server.serverThread.broadcastData(server.userlist.toPacket());
+			server.userlist.broadcastData(server.userlist.toPacket());
 
 			// Update userinfo
 			PacketUserInfo pUserInfo = new PacketUserInfo();
 			pUserInfo.addUserInfo(user.userInfo);
-			server.serverThread.broadcastData(pUserInfo);
+			server.userlist.broadcastData(pUserInfo);
 
 			// Same for new User
 			pUserInfo = new PacketUserInfo();
 			for (User u : server.userlist.getUsers())
 				pUserInfo.addUserInfo(u.userInfo);
-			server.serverThread.broadcastData(pUserInfo);
+			server.userlist.broadcastData(pUserInfo);
 
 			System.out.println("LOGIN SUCCESSFULL FOR: " + client.user.userInfo.username);
 
@@ -146,13 +148,15 @@ public class PacketHandler {
 		PacketChatBroadcast broadcast = new PacketChatBroadcast();
 		packet.text =
 		broadcast.text = packet.text;
-		//if (client.user != null) {
+		
+		// TODO temporary fix
+		broadcast.text = broadcast.text.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+		
 		broadcast.userId = client.user.userInfo.userID;
 		broadcast.channel = packet.channel;
-		//else
-		//	broadcast.userId = 0;
-		server.serverThread.broadcastData(broadcast);
-		//System.out.println("broadcasted Chat message");
+		broadcast.timestamp = System.currentTimeMillis();
+		
+		Chat.broadcastMessage(packet.channel, server.userlist, broadcast);
 	}
 
 }

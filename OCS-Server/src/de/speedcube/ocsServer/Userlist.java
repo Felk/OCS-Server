@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsUtilities.UserInfo;
+import de.speedcube.ocsUtilities.packets.Packet;
 import de.speedcube.ocsUtilities.packets.PacketUserlist;
 
 public class Userlist {
@@ -15,8 +16,21 @@ public class Userlist {
 	}
 	
 	public User getUser(String username) {
-		for(User u: users)
+		for(User u: users) {
+			if (u == null) {
+				System.out.println("USER IS NULL!");
+				continue;
+			}
+			if (u.userInfo == null) {
+				System.out.println("USERINFO IS NULL!");
+				continue;
+			}
+			if (u.userInfo.username == null) {
+				System.out.println("USERNAME IS NULL!");
+				continue;
+			}
 			if (u.userInfo.username.equals(username)) return u;
+		}
 		return null;
 	}
 	
@@ -36,10 +50,8 @@ public class Userlist {
 	public PacketUserlist toPacket() {
 		int num = users.size();
 		int[] userIds = new int[num];
-		String[] usernames = new String[num];
 		for (int i = 0; i < num; i++) {
 			userIds[i] = users.get(i).userInfo.userID;
-			usernames[i] = users.get(i).userInfo.username;
 		}
 		PacketUserlist p = new PacketUserlist();
 		p.userIds = userIds;
@@ -54,6 +66,10 @@ public class Userlist {
 		ArrayList<UserInfo> infos = new ArrayList<UserInfo>();
 		for (User u : users) infos.add(u.userInfo);
 		return infos;
+	}
+	
+	public void broadcastData(Packet packet) {
+		for (User u : users) u.getClient().sendPacket(packet);
 	}
 	
 }
