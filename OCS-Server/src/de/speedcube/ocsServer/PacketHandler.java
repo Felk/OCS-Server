@@ -3,22 +3,12 @@ package de.speedcube.ocsServer;
 import java.sql.SQLException;
 
 import de.speedcube.ocsServer.chat.Chat;
+import de.speedcube.ocsServer.chat.Chatmessage;
 import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsUtilities.Config;
 import de.speedcube.ocsUtilities.Userranks;
 import de.speedcube.ocsUtilities.language.LangAuthentification;
-import de.speedcube.ocsUtilities.packets.Packet;
-import de.speedcube.ocsUtilities.packets.PacketChat;
-import de.speedcube.ocsUtilities.packets.PacketChatBroadcast;
-import de.speedcube.ocsUtilities.packets.PacketLogin;
-import de.speedcube.ocsUtilities.packets.PacketLoginError;
-import de.speedcube.ocsUtilities.packets.PacketLoginSuccess;
-import de.speedcube.ocsUtilities.packets.PacketRegistration;
-import de.speedcube.ocsUtilities.packets.PacketRegistrationError;
-import de.speedcube.ocsUtilities.packets.PacketRegistrationSuccess;
-import de.speedcube.ocsUtilities.packets.PacketSalt;
-import de.speedcube.ocsUtilities.packets.PacketSaltGet;
-import de.speedcube.ocsUtilities.packets.PacketUserInfo;
+import de.speedcube.ocsUtilities.packets.*;
 import de.speedcube.ocsUtilities.security.RandomString;
 
 public class PacketHandler {
@@ -64,7 +54,7 @@ public class PacketHandler {
 		client.sendPacket(packetSalt);
 
 		// Remember the Name, to which the client propably enters a password shortly after
-		System.out.println("!!!"+(client.user == null));
+		System.out.println("!!!" + (client.user == null));
 		client.user.userInfo.username = packet.username;
 
 	}
@@ -144,19 +134,11 @@ public class PacketHandler {
 	}
 
 	public static void handleChatPacket(OCSServer server, Client client, PacketChat packet) {
-		System.out.println("Got chat message: " + packet.text);
-		PacketChatBroadcast broadcast = new PacketChatBroadcast();
-		packet.text =
-		broadcast.text = packet.text;
+
+		Chatmessage msg = new Chatmessage(client.user.userInfo.userID, packet.channel, packet.text, System.currentTimeMillis());
+
+		Chat.parseMessage(server.userlist, msg);
 		
-		// TODO temporary fix
-		broadcast.text = broadcast.text.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-		
-		broadcast.userId = client.user.userInfo.userID;
-		broadcast.channel = packet.channel;
-		broadcast.timestamp = System.currentTimeMillis();
-		
-		Chat.broadcastMessage(packet.channel, server.userlist, broadcast);
 	}
 
 }

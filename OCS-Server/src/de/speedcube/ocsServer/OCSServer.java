@@ -1,8 +1,8 @@
 package de.speedcube.ocsServer;
 
+import java.beans.PropertyVetoException;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -71,6 +71,9 @@ public class OCSServer {
 			running = false;
 		} catch (IOException e) {
 			System.out.println("Could not read connection properties file");
+			e.printStackTrace();
+		} catch (PropertyVetoException e) {
+			System.out.println("Could not create connection Pool");
 			e.printStackTrace();
 		}
 
