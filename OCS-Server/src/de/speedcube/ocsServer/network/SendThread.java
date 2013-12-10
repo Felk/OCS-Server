@@ -40,9 +40,9 @@ public class SendThread extends Thread {
 							Packet packet = data.get(0);
 							data.remove(0);
 							if (!packet.packed) {
-								packet.pack();
+								//packet.pack();
 								packet.packInNetworkBuffer();
-								packet.packed = true;
+								//packet.packed = true;
 							}
 							byte[] buffer = packet.networkBuffer;
 							out.write(buffer);

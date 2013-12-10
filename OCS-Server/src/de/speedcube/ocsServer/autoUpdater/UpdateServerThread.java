@@ -33,12 +33,12 @@ public class UpdateServerThread extends Thread {
 	}
 	
 	public void stopServer() {
-		running = false;
 		synchronized (clients) {
-			while (clients.size() > 0) {
-				clients.get(0).stopClient();
+			for (UpdateClient c : clients) {
+				c.stopClient();
 			}
 		}
+		running = false;
 
 		try {
 			serverSocket.close();

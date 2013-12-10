@@ -27,13 +27,15 @@ public class PacketHandler {
 				handleRegistrationPacket(server, client, (PacketRegistration) p);
 				return;
 
-			} else if (client.user.userInfo.rank >= Userranks.NORMAL) {
+			}
+			if (client.user.userInfo.rank >= Userranks.NORMAL) {
 				// Wenn authentifiziert
 				if (p instanceof PacketChat) {
 					handleChatPacket(server, client, (PacketChat) p);
 					return;
 				}
 			}
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.out.println("Could not handle package " + p.getName() + " due to database errors.");
@@ -54,7 +56,6 @@ public class PacketHandler {
 		client.sendPacket(packetSalt);
 
 		// Remember the Name, to which the client propably enters a password shortly after
-		System.out.println("!!!" + (client.user == null));
 		client.user.userInfo.username = packet.username;
 
 	}
@@ -137,8 +138,8 @@ public class PacketHandler {
 
 		Chatmessage msg = new Chatmessage(client.user.userInfo.userID, packet.channel, packet.text, System.currentTimeMillis());
 
-		Chat.parseMessage(server.userlist, msg);
-		
+		Chat.parseMessage(server, server.userlist, msg);
+
 	}
 
 }

@@ -4,17 +4,17 @@ import de.speedcube.ocsServer.OCSServer;
 import de.speedcube.ocsServer.chat.Chatmessage;
 import de.speedcube.ocsUtilities.Userranks;
 
-public class ChatcommandTest extends Chatcommand {
+public class ChatcommandRestart extends Chatcommand {
 
 	@Override
 	public Chatmessage parse(OCSServer server, Chatmessage msg) {
-		msg.setText("TESTCOMMAND: " + msg.getText());
-		return msg;
+		server.restart();
+		return null;
 	}
 
 	@Override
 	public int getRank() {
-		return Userranks.NORMAL;
+		return Userranks.DEV;
 	}
 
 }

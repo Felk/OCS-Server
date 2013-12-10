@@ -1,6 +1,8 @@
 package de.speedcube.ocsServer.sql;
 
 import java.beans.PropertyVetoException;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -30,8 +32,7 @@ public class OCSDatabase {
 		this.user = user;
 		this.database = database;
 		this.port = port;
-		//connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, user, password);
-		
+
 		dataSource = new ComboPooledDataSource();
 		dataSource.setDriverClass("com.mysql.jdbc.Driver");
 		dataSource.setJdbcUrl("jdbc:mysql://"+host+":"+port+"/"+database);
@@ -45,9 +46,7 @@ public class OCSDatabase {
 	}
 	
 	private Connection getConnection() throws SQLException {
-		System.out.println("trying to get connection");
 		Connection c = dataSource.getConnection();
-		System.out.println("found connection");
 		return c;
 	}
 
@@ -124,6 +123,16 @@ public class OCSDatabase {
 		ps.setString(3, salt);
 		ps.setString(4, transmission_salt);
 		ps.execute();
+	}
+
+	public void closeConnection() {
+		try {
+			getConnection().close();
+			dataSource.close();
+		} catch (SQLException e) {
+			System.out.println("Could not close database.");
+			e.printStackTrace();
+		}
 	}
 
 }

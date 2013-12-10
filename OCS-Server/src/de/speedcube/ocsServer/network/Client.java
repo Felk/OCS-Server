@@ -7,6 +7,7 @@ import de.speedcube.ocsServer.User;
 import de.speedcube.ocsServer.OCSServer;
 import de.speedcube.ocsUtilities.packets.Packet;
 import de.speedcube.ocsUtilities.packets.PacketConnectionInfo;
+import de.speedcube.ocsUtilities.packets.PacketDisconnect;
 
 
 public class Client {
@@ -93,6 +94,13 @@ public class Client {
 		if (clientType == SERVER_CLIENT) {
 			server.removeClient(this);
 		}
+	}
+	
+	public void disconnect(String msg) {
+		PacketDisconnect packet = new PacketDisconnect();
+		packet.msg = msg;
+		sendPacket(packet);
+		stopClient();
 	}
 	
 }
