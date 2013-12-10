@@ -43,6 +43,8 @@ public class OCSServer {
 
 		//System.out.println(Sha2.hashPassword(Sha2.hashPassword("42", "UkyKiTw;Hje.;@kNwKPL"), "$xccyy^>ef21an-5fUF="));
 		
+		System.out.println("started server");
+		
 		running = true;
 
 		serverThread = new ServerThread(34543, packageReceiveNotify);
@@ -57,6 +59,7 @@ public class OCSServer {
 			stream.close();
 			
 			// Try database connection
+			System.out.println("trying to load database...");
 			database = new OCSDatabase(properties.getProperty("host"), properties.getProperty("username"), properties.getProperty("password"), properties.getProperty("database"));
 			
 			if (database.checkAllTables()) {

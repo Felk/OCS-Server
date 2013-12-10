@@ -18,6 +18,7 @@ public class OCSDatabase {
 
 	private ComboPooledDataSource dataSource;
 	private static final String PREFIX = "ocs_";
+	private static final int TIMEOUT = 3000;
 	private static final String[] requiredTables = new String[1];
 	public String host;
 	public String user;
@@ -36,6 +37,7 @@ public class OCSDatabase {
 		dataSource.setJdbcUrl("jdbc:mysql://"+host+":"+port+"/"+database);
 		dataSource.setUser(user);
 		dataSource.setPassword(password); 
+		dataSource.setCheckoutTimeout(TIMEOUT);
 	}
 
 	public OCSDatabase(String host, String user, String password, String database) throws SQLException, PropertyVetoException {
@@ -43,7 +45,10 @@ public class OCSDatabase {
 	}
 	
 	private Connection getConnection() throws SQLException {
-		return dataSource.getConnection();
+		System.out.println("trying to get connection");
+		Connection c = dataSource.getConnection();
+		System.out.println("found connection");
+		return c;
 	}
 
 	public boolean checkAllTables() throws SQLException {
@@ -99,13 +104,13 @@ public class OCSDatabase {
 	}
 
 	static {
-		try {
+		/*try {
 			// Loading the Connector/J Driver
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 			e.printStackTrace();
 			System.out.println("ERROR: Could not load Connector/J Driver for Database Connection");
-		}
+		}*/
 
 		requiredTables[0] = "users";
 	}
