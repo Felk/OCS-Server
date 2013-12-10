@@ -10,6 +10,8 @@ public class Chatmessage {
 	private long timestamp;
 	
 	public Chatmessage(int userID, String channel, String text, long timestamp) {
+		if (channel == null) channel = "";
+		if (text == null) text = "";
 		this.setUserID(userID);
 		this.setChannel(channel);
 		this.setText(text);

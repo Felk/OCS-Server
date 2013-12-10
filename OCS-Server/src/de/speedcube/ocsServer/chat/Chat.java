@@ -23,6 +23,8 @@ public class Chat {
 
 	public static void broadcastMessage(Userlist userlist, Chatmessage msg) {
 
+		System.out.println("trying to send chatpacket for "+msg.getChannel());
+		
 		for (User u : userlist.getUsers()) {
 			if (msg.getChannel().isEmpty() || u.channels.contains(msg.getChannel())) {
 				u.getClient().sendPacket(msg.toPacket());
