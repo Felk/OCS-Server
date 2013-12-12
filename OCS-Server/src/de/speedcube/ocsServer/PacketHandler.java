@@ -81,7 +81,7 @@ public class PacketHandler {
 			client.sendPacket(packetSuccess);
 
 			// Update userlist
-			server.userlist.broadcastData(server.userlist.toPacket());
+			server.userlist.updateUserlist();
 
 			// Update userinfo
 			PacketUserInfo pUserInfo = new PacketUserInfo();

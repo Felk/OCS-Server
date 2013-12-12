@@ -1,9 +1,12 @@
 package de.speedcube.ocsServer;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import de.speedcube.ocsServer.network.Client;
+import de.speedcube.ocsServer.sql.OCSDatabase;
 import de.speedcube.ocsUtilities.packets.PacketLogout;
+import de.speedcube.ocsUtilities.packets.PacketUserInfo;
 import de.speedcube.ocsUtilities.UserInfo;
 
 public class User {
@@ -41,6 +44,12 @@ public class User {
 		client.sendPacket(packetLogout);
 		remove();
 	}
+	
+	public void update() {
+		PacketUserInfo packet = new PacketUserInfo();
+		packet.addUserInfo(userInfo);
+		userlist.broadcastData(packet);
+	}
 
 	public void setClient(Client c) {
 		this.client = c;
@@ -54,14 +63,20 @@ public class User {
 	public void setUserlist(Userlist userlist) {
 		this.userlist = userlist;
 	}
-	
+
 	public void leaveChannel(String channel) {
 		channels.remove(channel);
 	}
-	
+
 	public boolean enterChannel(String channel) {
 		if (!channels.contains(channel)) channels.add(channel);
 		return true;
+	}
+
+	public void setColor(int color, OCSDatabase db) throws SQLException {
+		db.setColor(userInfo.userID, color);
+		userInfo.color = color;
+		update();
 	}
 
 }

@@ -1,14 +1,11 @@
 package de.speedcube.ocsServer.sql;
 
 import java.beans.PropertyVetoException;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import de.speedcube.ocsServer.User;
 import de.speedcube.ocsUtilities.Config;
@@ -18,27 +15,34 @@ import de.speedcube.ocsUtilities.security.Sha2;
 
 public class OCSDatabase {
 
-	private ComboPooledDataSource dataSource;
+	//private ComboPooledDataSource dataSource;
+	private Connection connection;
 	private static final String PREFIX = "ocs_";
 	private static final int TIMEOUT = 3000;
 	private static final String[] requiredTables = new String[1];
 	public String host;
 	public String user;
+	public String password;
 	public String database;
 	public int port;
 
-	public OCSDatabase(String host, String user, String password, String database, int port) throws SQLException, PropertyVetoException {
+	public OCSDatabase(String host, String user, String password, String database, int port) throws SQLException {
 		this.host = host;
 		this.user = user;
+		this.password = password;
 		this.database = database;
 		this.port = port;
 
-		dataSource = new ComboPooledDataSource();
+		/*dataSource = new ComboPooledDataSource();
 		dataSource.setDriverClass("com.mysql.jdbc.Driver");
 		dataSource.setJdbcUrl("jdbc:mysql://"+host+":"+port+"/"+database);
 		dataSource.setUser(user);
 		dataSource.setPassword(password); 
-		dataSource.setCheckoutTimeout(TIMEOUT);
+		dataSource.setCheckoutTimeout(TIMEOUT);*/
+	}
+	
+	private void connect() throws SQLException {
+		connection = DriverManager.getConnection("jdbc:mysql://"+host+"/"+database, user, password);
 	}
 
 	public OCSDatabase(String host, String user, String password, String database) throws SQLException, PropertyVetoException {
@@ -46,8 +50,11 @@ public class OCSDatabase {
 	}
 	
 	private Connection getConnection() throws SQLException {
-		Connection c = dataSource.getConnection();
-		return c;
+		if (!connection.isValid(TIMEOUT)) {
+			connection.close();
+			connect();
+		}
+		return connection;
 	}
 
 	public boolean checkAllTables() throws SQLException {
@@ -103,13 +110,13 @@ public class OCSDatabase {
 	}
 
 	static {
-		/*try {
+		try {
 			// Loading the Connector/J Driver
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 			e.printStackTrace();
 			System.out.println("ERROR: Could not load Connector/J Driver for Database Connection");
-		}*/
+		}
 
 		requiredTables[0] = "users";
 	}
@@ -124,11 +131,18 @@ public class OCSDatabase {
 		ps.setString(4, transmission_salt);
 		ps.execute();
 	}
+	
+	public void setColor(int userID, int color) throws SQLException {
+		PreparedStatement ps = getConnection().prepareStatement("UPDATE "+PREFIX+"users SET color = ? WHERE id = ? LIMIT 1");
+		ps.setInt(1, color);
+		ps.setInt(2, userID);
+		ps.execute();
+	}
 
 	public void closeConnection() {
 		try {
 			getConnection().close();
-			dataSource.close();
+			//dataSource.close();
 		} catch (SQLException e) {
 			System.out.println("Could not close database.");
 			e.printStackTrace();

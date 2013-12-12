@@ -7,7 +7,14 @@ import de.speedcube.ocsServer.chat.commands.Chatcommand;
 
 public class Chat {
 
+	public static final int MAX_CHAT_LENGTH = 2000;
+
 	public static void parseMessage(OCSServer server, Userlist userlist, Chatmessage msg) {
+
+		if (msg.getText().length() > MAX_CHAT_LENGTH) {
+			// send an error message?
+			return;
+		}
 
 		String command = msg.getText().split(" ")[0];
 		if (command.substring(0, 1).equals("/")) {
@@ -22,19 +29,16 @@ public class Chat {
 					}
 					msg = chatcommand.parse(server, msg);
 				} else {
-					// TODO hack. Please nerf
+					// TODO temporarily
 					msg.setText("Nicht genügend Rechte");
 				}
 			} else {
-				// TODO hack. Please nerf
+				// TODO temporarily
 				msg.setText("Befehl wurde nicht erkannt.");
 			}
 		}
 
 		if (msg == null) return;
-		
-		// TODO temporary fix
-		msg.setText(msg.getText().replaceAll("<", "&lt;").replaceAll(">", "&gt;"));
 
 		Chat.broadcastMessage(userlist, msg);
 
@@ -42,14 +46,23 @@ public class Chat {
 
 	public static void broadcastMessage(Userlist userlist, Chatmessage msg) {
 
-		System.out.println("trying to send chatpacket for " + msg.getChannel());
-
 		for (User u : userlist.getUsers()) {
 			if (msg.getChannel().isEmpty() || u.channels.contains(msg.getChannel())) {
-				u.getClient().sendPacket(msg.toPacket());
+				sendMessage(msg, u);
 			}
 		}
 
+	}
+
+	public static void sendMessage(Chatmessage msg, User user) {
+		sendMessage(msg, new User[] { user });
+	}
+
+	public static void sendMessage(Chatmessage msg, User[] users) {
+		// Escape HTML
+		msg.setText(msg.getText().replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;"));
+		for (User u : users)
+			u.getClient().sendPacket(msg.toPacket());
 	}
 
 }

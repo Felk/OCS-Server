@@ -21,7 +21,7 @@ public class Userlist {
 		}
 		return null;
 	}
-	
+
 	public User getUser(int id) {
 		for (User u : users) {
 			if (u.userInfo.userID == id) return u;
@@ -66,11 +66,13 @@ public class Userlist {
 	}
 
 	public void broadcastData(Packet packet) {
-		//packet.pack();
-		packet.packInNetworkBuffer();
-		//packet.packed = true;
+		if (!packet.isPacked()) packet.pack();
 		for (User u : users)
 			u.getClient().sendPacket(packet);
+	}
+
+	public void updateUserlist() {
+		broadcastData(toPacket());
 	}
 
 }

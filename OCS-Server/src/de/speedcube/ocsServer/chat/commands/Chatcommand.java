@@ -24,6 +24,7 @@ public abstract class Chatcommand {
 		registerCommand("test", new ChatcommandTest());
 		registerCommand("stop", new ChatcommandStop());
 		registerCommand("restart", new ChatcommandRestart());
+		registerCommand("color", new ChatcommandColor());
 	}
 
 }
