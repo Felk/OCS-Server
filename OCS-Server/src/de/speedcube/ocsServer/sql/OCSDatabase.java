@@ -33,6 +33,7 @@ public class OCSDatabase {
 		this.database = database;
 		this.port = port;
 
+		connect();
 		/*dataSource = new ComboPooledDataSource();
 		dataSource.setDriverClass("com.mysql.jdbc.Driver");
 		dataSource.setJdbcUrl("jdbc:mysql://"+host+":"+port+"/"+database);
