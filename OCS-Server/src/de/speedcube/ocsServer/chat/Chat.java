@@ -16,6 +16,9 @@ public class Chat {
 			return;
 		}
 
+		msg.setText(msg.getText().trim());
+		if (msg.getText().isEmpty()) return;
+
 		String command = msg.getText().split(" ")[0];
 		if (command.substring(0, 1).equals("/")) {
 			Chatcommand chatcommand = Chatcommand.getCommand(command.substring(1));
@@ -37,7 +40,8 @@ public class Chat {
 				msg.setText("Befehl wurde nicht erkannt.");
 			}
 		}
-
+		
+		// maybe parsed to null
 		if (msg == null) return;
 
 		Chat.broadcastMessage(userlist, msg);

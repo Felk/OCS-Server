@@ -1,5 +1,8 @@
 package de.speedcube.ocsServer;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 
 import de.speedcube.ocsServer.network.Client;
@@ -73,6 +76,39 @@ public class Userlist {
 
 	public void updateUserlist() {
 		broadcastData(toPacket());
+		writeUserlistFile();
 	}
 
+	public void writeUserlistFile() {
+
+		BufferedWriter writer = null;
+		try {
+			File file = new File("online.txt");
+			writer = new BufferedWriter(new FileWriter(file));
+			writer.write(toTxtString());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				// Close the writer regardless of what happens...
+				writer.close();
+			} catch (Exception e) {
+			}
+		}
+
+	}
+
+	public String toTxtString() {
+		
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		for (User u : users) {
+			if (!first) sb.append(",");
+			sb.append(u.userInfo.username+":"+Integer.toHexString(u.userInfo.color));
+			first = false;
+		}
+		
+		return sb.toString();
+		
+	}
 }

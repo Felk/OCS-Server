@@ -1,6 +1,5 @@
 package de.speedcube.ocsServer.sql;
 
-import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -46,7 +45,7 @@ public class OCSDatabase {
 		connection = DriverManager.getConnection("jdbc:mysql://"+host+"/"+database, user, password);
 	}
 
-	public OCSDatabase(String host, String user, String password, String database) throws SQLException, PropertyVetoException {
+	public OCSDatabase(String host, String user, String password, String database) throws SQLException {
 		this(host, user, password, database, 3306);
 	}
 	

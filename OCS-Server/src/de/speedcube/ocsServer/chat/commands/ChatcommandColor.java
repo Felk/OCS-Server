@@ -37,7 +37,7 @@ public class ChatcommandColor extends Chatcommand {
 
 	@Override
 	public int getRank() {
-		return Userranks.DEV;
+		return Userranks.NORMAL;
 	}
 
 }

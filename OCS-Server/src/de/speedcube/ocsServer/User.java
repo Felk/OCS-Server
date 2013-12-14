@@ -44,7 +44,7 @@ public class User {
 		client.sendPacket(packetLogout);
 		remove();
 	}
-	
+
 	public void update() {
 		PacketUserInfo packet = new PacketUserInfo();
 		packet.addUserInfo(userInfo);
@@ -66,10 +66,12 @@ public class User {
 
 	public void leaveChannel(String channel) {
 		channels.remove(channel);
+		update();
 	}
 
 	public boolean enterChannel(String channel) {
 		if (!channels.contains(channel)) channels.add(channel);
+		update();
 		return true;
 	}
 

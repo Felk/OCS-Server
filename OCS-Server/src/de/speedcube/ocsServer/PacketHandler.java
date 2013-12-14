@@ -7,7 +7,6 @@ import de.speedcube.ocsServer.chat.Chatmessage;
 import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsUtilities.Config;
 import de.speedcube.ocsUtilities.Userranks;
-import de.speedcube.ocsUtilities.language.LangAuthentification;
 import de.speedcube.ocsUtilities.packets.*;
 import de.speedcube.ocsUtilities.security.RandomString;
 
@@ -78,6 +77,7 @@ public class PacketHandler {
 
 			PacketLoginSuccess packetSuccess = new PacketLoginSuccess();
 			packetSuccess.username = client.user.userInfo.username;
+			packetSuccess.userID = client.user.userInfo.userID;
 			client.sendPacket(packetSuccess);
 
 			// Update userlist
@@ -110,7 +110,7 @@ public class PacketHandler {
 		if (server.database.userExists(packet.username)) {
 
 			PacketRegistrationError packetError = new PacketRegistrationError();
-			packetError.errNr = LangAuthentification.ERR_REG_USERNAME_TAKEN;
+			packetError.err = "reg.username_taken";
 			client.sendPacket(packetError);
 			System.out.println("Username existiert bereits: " + packet.username);
 
@@ -118,7 +118,7 @@ public class PacketHandler {
 		} else if (!packet.username.matches(Config.USERNAME_REGEXP)) {
 
 			PacketRegistrationError packetError = new PacketRegistrationError();
-			packetError.errNr = LangAuthentification.ERR_REG_USERNAME_INVALID;
+			packetError.err = "reg.username_invalid";
 			client.sendPacket(packetError);
 			System.out.println("Username zu lang/kurz: " + packet.username);
 
