@@ -8,6 +8,7 @@ import de.speedcube.ocsServer.OCSServer;
 import de.speedcube.ocsUtilities.packets.Packet;
 import de.speedcube.ocsUtilities.packets.PacketConnectionInfo;
 import de.speedcube.ocsUtilities.packets.PacketDisconnect;
+import de.speedcube.ocsUtilities.packets.PacketSystemMessage;
 
 
 public class Client {
@@ -16,9 +17,6 @@ public class Client {
 	SendThread sender;
 	ReceiveThread receiver;
 
-	public static final int CLIENT = 0;
-	public static final int SERVER_CLIENT = 1;
-	public int clientType = CLIENT;
 	public ServerThread server;
 	public PacketConnectionInfo connectionInfo;
 	public boolean connectionInfoReceived = false;
@@ -33,7 +31,6 @@ public class Client {
 		this.server = server;
 		this.receiveNotify = receiveNotify;
 		connected = true;
-		clientType = SERVER_CLIENT;
 		init();
 	}
 
@@ -80,6 +77,13 @@ public class Client {
 		if (socket != null) { return socket.getInetAddress().getHostAddress() + ":" + socket.getPort(); }
 		return "";
 	}
+	
+	public void sendSystemMessage(String msg) {
+		PacketSystemMessage p = new PacketSystemMessage();
+		p.msg = msg;
+		p.timestamp = System.currentTimeMillis();
+		sendPacket(p);
+	}
 
 	public void stopClient() {
 		connected = false;
@@ -90,10 +94,7 @@ public class Client {
 		
 		user.remove();
 		//if (user != null )server.broadcastData(user.userlist.toPacket());
-		
-		if (clientType == SERVER_CLIENT) {
-			server.removeClient(this);
-		}
+
 	}
 	
 	public void disconnect(String msg) {

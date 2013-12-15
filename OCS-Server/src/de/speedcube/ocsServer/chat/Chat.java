@@ -11,6 +11,9 @@ public class Chat {
 
 	public static void parseMessage(OCSServer server, Userlist userlist, Chatmessage msg) {
 
+		User u = userlist.getUser(msg.getUserID());
+		if (u == null) return;
+		
 		if (msg.getText().length() > MAX_CHAT_LENGTH) {
 			// send an error message?
 			return;
@@ -32,16 +35,16 @@ public class Chat {
 					}
 					msg = chatcommand.parse(server, msg);
 				} else {
-					// TODO temporarily
-					msg.setText("Nicht genügend Rechte");
+					msg = null;
+					u.getClient().sendSystemMessage("chat.command.insufficient_rank");
 				}
 			} else {
-				// TODO temporarily
-				msg.setText("Befehl wurde nicht erkannt.");
+				msg = null;
+				u.getClient().sendSystemMessage("chat.command.unknown");
 			}
 		}
 		
-		// maybe parsed to null
+		// maybe parsed to null (errors, non-chat commands)
 		if (msg == null) return;
 
 		Chat.broadcastMessage(userlist, msg);
