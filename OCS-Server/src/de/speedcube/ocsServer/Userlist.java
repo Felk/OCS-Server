@@ -63,7 +63,6 @@ public class Userlist {
 	public ArrayList<UserInfo> getUserInfos() {
 		ArrayList<UserInfo> infos = new ArrayList<UserInfo>();
 		for (User u : users) {
-			System.out.println("USER: " + u);
 			infos.add(u.userInfo);
 		}
 		return infos;
@@ -126,8 +125,6 @@ public class Userlist {
 	}
 	
 	public void removeUser(User u) {
-		System.out.println("removing user");
-		broadcastSystemMessage("chat.logout", u.userInfo.username);
-		users.remove(u);
+		if (users.remove(u)) broadcastSystemMessage("chat.logout", u.userInfo.username);
 	}
 }

@@ -40,7 +40,7 @@ public class User {
 
 	public void kick() {
 		PacketLogout packetLogout = new PacketLogout();
-		packetLogout.msg = "You got kicked!";
+		packetLogout.msg = "system.msg.logout";
 		client.sendPacket(packetLogout);
 		remove();
 	}

@@ -61,8 +61,7 @@ public class PacketHandler {
 
 	public static void handleLoginPacket(OCSServer server, Client client, PacketLogin packet) throws SQLException {
 
-		//System.out.println("Got login attempt.");
-		//client.clientInformation;
+
 		User user = server.database.getUser(client.user.userInfo.username, packet.password);
 
 		if (user != null) {
@@ -112,7 +111,6 @@ public class PacketHandler {
 			PacketRegistrationError packetError = new PacketRegistrationError();
 			packetError.err = "reg.username_taken";
 			client.sendPacket(packetError);
-			System.out.println("Username existiert bereits: " + packet.username);
 
 			//} else if (packet.username.length() > Config.USERNAME_MAX_LENGTH || packet.username.length() < Config.USERNAME_MIN_LENGTH) {
 		} else if (!packet.username.matches(Config.USERNAME_REGEXP)) {
@@ -120,7 +118,6 @@ public class PacketHandler {
 			PacketRegistrationError packetError = new PacketRegistrationError();
 			packetError.err = "reg.username_invalid";
 			client.sendPacket(packetError);
-			System.out.println("Username zu lang/kurz: " + packet.username);
 
 		} else {
 
@@ -128,7 +125,6 @@ public class PacketHandler {
 			PacketRegistrationSuccess packetSuccess = new PacketRegistrationSuccess();
 			packetSuccess.username = packet.username;
 			client.sendPacket(packetSuccess);
-			System.out.println("Registrierung erfolgreich für: " + packet.username);
 
 		}
 

@@ -11,8 +11,6 @@ public class ChatcommandColor extends Chatcommand {
 	@Override
 	public Chatmessage parse(OCSServer server, Chatmessage msg) {
 
-		System.out.println("Parsing ChatcommandColor");
-
 		if (msg.getText().length() != 6) return null;
 
 		int c;

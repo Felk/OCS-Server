@@ -57,8 +57,6 @@ public class OCSServer {
 
 	private void start() {
 
-		//System.out.println(Sha2.hashPassword(Sha2.hashPassword("42", "UkyKiTw;Hje.;@kNwKPL"), "$xccyy^>ef21an-5fUF="));
-
 		System.out.println("Started Server");
 
 		running = true;
@@ -109,7 +107,6 @@ public class OCSServer {
 					for (Packet p : c.getData(Packet.CHAT_CHANNEL))
 						packets.add(p);
 					for (Packet p : packets) {
-						System.out.println("handling packet: " + p.getName());
 						PacketHandler.handlePackage(this, c, p);
 					}
 					packets.clear();
