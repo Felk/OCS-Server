@@ -8,7 +8,7 @@ public class ChatcommandRestart extends Chatcommand {
 
 	@Override
 	public Chatmessage parse(OCSServer server, Chatmessage msg) {
-		server.restart();
+		server.restart(msg.getText());
 		return null;
 	}
 

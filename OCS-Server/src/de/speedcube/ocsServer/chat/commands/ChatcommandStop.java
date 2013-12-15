@@ -8,7 +8,7 @@ public class ChatcommandStop extends Chatcommand {
 
 	@Override
 	public Chatmessage parse(OCSServer server, Chatmessage msg) {
-		server.stop("Server Shutdown");
+		server.stop(msg.getText());
 		return null;
 	}
 

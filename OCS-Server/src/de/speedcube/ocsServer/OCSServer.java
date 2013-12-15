@@ -50,8 +50,8 @@ public class OCSServer {
 		running = false;
 	}
 
-	public void restart() {
-		stop("Server Restart");
+	public void restart(String msg) {
+		stop(msg);
 		restart = true;
 	}
 
