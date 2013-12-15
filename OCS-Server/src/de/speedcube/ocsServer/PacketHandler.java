@@ -136,7 +136,7 @@ public class PacketHandler {
 
 	public static void handleChatPacket(OCSServer server, Client client, PacketChat packet) {
 
-		Chatmessage msg = new Chatmessage(client.user.userInfo.userID, packet.channel, packet.text, System.currentTimeMillis());
+		Chatmessage msg = new Chatmessage(client.user.userInfo.userID, packet.chatChannel, packet.text, System.currentTimeMillis());
 
 		Chat.parseMessage(server, server.userlist, msg);
 

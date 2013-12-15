@@ -30,7 +30,7 @@ public class User {
 		userInfo = new UserInfo();
 		if (userlist != null) {
 			userlist.getUsers().remove(this);
-			userlist.broadcastData(userlist.toPacket());
+			userlist.updateUserlist();
 		}
 	}
 

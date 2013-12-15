@@ -21,7 +21,7 @@ public class Chatmessage {
 	public PacketChatBroadcast toPacket() {
 		PacketChatBroadcast packet = new PacketChatBroadcast();
 		packet.userId = getUserID();
-		packet.channel = getChannel();
+		packet.chatChannel = getChannel();
 		packet.text = getText();
 		packet.timestamp = getTimestamp();
 		return packet;
