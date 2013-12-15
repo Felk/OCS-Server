@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsUtilities.UserInfo;
 import de.speedcube.ocsUtilities.packets.Packet;
+import de.speedcube.ocsUtilities.packets.PacketSystemMessage;
 import de.speedcube.ocsUtilities.packets.PacketUserlist;
 
 public class Userlist {
@@ -73,6 +74,18 @@ public class Userlist {
 		for (User u : users)
 			u.getClient().sendPacket(packet);
 	}
+	
+	public void broadcastSystemMessage(String msg) {
+		broadcastSystemMessage(msg, new String[]{});
+	}
+	
+	public void broadcastSystemMessage(String msg, String... values) {
+		PacketSystemMessage p = new PacketSystemMessage();
+		p.msg = msg;
+		p.values = values;
+		p.timestamp = System.currentTimeMillis();
+		broadcastData(p);
+	}
 
 	public void updateUserlist() {
 		broadcastData(toPacket());
@@ -110,5 +123,10 @@ public class Userlist {
 		
 		return sb.toString();
 		
+	}
+	
+	public void removeUser(User u) {
+		broadcastSystemMessage("chat.logout", u.userInfo.username);
+		users.remove(u);
 	}
 }

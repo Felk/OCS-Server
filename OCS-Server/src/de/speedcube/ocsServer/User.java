@@ -27,11 +27,11 @@ public class User {
 	}
 
 	public void remove() {
-		userInfo = new UserInfo();
 		if (userlist != null) {
-			userlist.getUsers().remove(this);
+			userlist.removeUser(this);
 			userlist.updateUserlist();
 		}
+		userInfo = new UserInfo();
 	}
 
 	public void closeConnection() {

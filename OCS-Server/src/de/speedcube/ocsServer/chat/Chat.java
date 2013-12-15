@@ -36,11 +36,11 @@ public class Chat {
 					msg = chatcommand.parse(server, msg);
 				} else {
 					msg = null;
-					u.getClient().sendSystemMessage("chat.command.insufficient_rank");
+					u.getClient().sendSystemMessage("chat.command.insufficient_rank", new String[]{command});
 				}
 			} else {
 				msg = null;
-				u.getClient().sendSystemMessage("chat.command.unknown");
+				u.getClient().sendSystemMessage("chat.command.unknown", new String[]{command});
 			}
 		}
 		

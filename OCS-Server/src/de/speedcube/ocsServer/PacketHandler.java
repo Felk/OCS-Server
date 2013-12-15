@@ -94,7 +94,7 @@ public class PacketHandler {
 				pUserInfo.addUserInfo(u.userInfo);
 			server.userlist.broadcastData(pUserInfo);
 
-			System.out.println("LOGIN SUCCESSFULL FOR: " + client.user.userInfo.username);
+			server.userlist.broadcastSystemMessage("chat.login", client.user.userInfo.username);
 
 		} else {
 			PacketLoginError packetFailed = new PacketLoginError();

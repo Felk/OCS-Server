@@ -79,8 +79,13 @@ public class Client {
 	}
 	
 	public void sendSystemMessage(String msg) {
+		sendSystemMessage(msg, new String[]{});
+	}
+	
+	public void sendSystemMessage(String msg, String... values) {
 		PacketSystemMessage p = new PacketSystemMessage();
 		p.msg = msg;
+		p.values = values;
 		p.timestamp = System.currentTimeMillis();
 		sendPacket(p);
 	}
