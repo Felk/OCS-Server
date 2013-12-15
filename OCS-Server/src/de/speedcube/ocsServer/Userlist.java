@@ -126,6 +126,7 @@ public class Userlist {
 	}
 	
 	public void removeUser(User u) {
+		System.out.println("removing user");
 		broadcastSystemMessage("chat.logout", u.userInfo.username);
 		users.remove(u);
 	}

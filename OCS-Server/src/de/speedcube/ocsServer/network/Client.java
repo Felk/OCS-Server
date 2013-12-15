@@ -98,6 +98,7 @@ public class Client {
 		sender.stopThread();
 		
 		user.remove();
+		
 		//if (user != null )server.broadcastData(user.userlist.toPacket());
 
 	}

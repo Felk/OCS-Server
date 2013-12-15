@@ -68,6 +68,7 @@ public class ServerThread extends Thread {
 		synchronized (clients) {
 			while (clients.size() > 0) {
 				clients.get(0).stopClient();
+				removeClient(clients.get(0));
 			}
 		}
 		running = false;
