@@ -3,6 +3,7 @@ package de.speedcube.ocsServer.chat.commands;
 import java.sql.SQLException;
 
 import de.speedcube.ocsServer.OCSServer;
+import de.speedcube.ocsServer.User;
 import de.speedcube.ocsServer.chat.Chatmessage;
 import de.speedcube.ocsUtilities.Userranks;
 
@@ -11,6 +12,13 @@ public class ChatcommandColor extends Chatcommand {
 	@Override
 	public Chatmessage parse(OCSServer server, Chatmessage msg) {
 
+		User user = server.userlist.getUser(msg.getUserID());
+		
+		if (msg.getText().length() == 0) {
+			msg.setText("Meine Farbe ist "+user.userInfo.getHexColor());
+			return msg;
+		}
+		
 		if (msg.getText().length() != 6) return null;
 
 		int c;
@@ -24,7 +32,7 @@ public class ChatcommandColor extends Chatcommand {
 		}
 
 		try {
-			server.userlist.getUser(msg.getUserID()).setColor(c, server.database);
+			user.setColor(c, server.database);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;

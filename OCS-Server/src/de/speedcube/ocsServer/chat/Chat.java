@@ -64,10 +64,14 @@ public class Chat {
 	public static void sendMessage(Chatmessage msg, User user) {
 		sendMessage(msg, new User[] { user });
 	}
+	
+	public static String escapeHTML(String s) {
+		return s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+	}
 
 	public static void sendMessage(Chatmessage msg, User[] users) {
 		// Escape HTML
-		msg.setText(msg.getText().replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;"));
+		//msg.setText(escapeHTML(msg.getText()));
 		for (User u : users)
 			u.getClient().sendPacket(msg.toPacket());
 	}

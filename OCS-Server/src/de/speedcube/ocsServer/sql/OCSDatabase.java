@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 import de.speedcube.ocsServer.User;
 import de.speedcube.ocsUtilities.Config;
+import de.speedcube.ocsUtilities.UserInfo;
 import de.speedcube.ocsUtilities.Userranks;
 import de.speedcube.ocsUtilities.security.RandomString;
 import de.speedcube.ocsUtilities.security.Sha2;
@@ -132,10 +133,13 @@ public class OCSDatabase {
 		ps.execute();
 	}
 	
-	public void setColor(int userID, int color) throws SQLException {
-		PreparedStatement ps = getConnection().prepareStatement("UPDATE "+PREFIX+"users SET color = ? WHERE id = ? LIMIT 1");
-		ps.setInt(1, color);
-		ps.setInt(2, userID);
+	public void updateUserInfo(UserInfo userInfo) throws SQLException {
+		PreparedStatement ps = getConnection().prepareStatement("UPDATE "+PREFIX+"users SET username = ?, rank = ?, color = ?, status = ? WHERE id = ? LIMIT 1");
+		ps.setString(1, userInfo.username);
+		ps.setInt(2, userInfo.rank);
+		ps.setInt(3, userInfo.color);
+		ps.setString(4, userInfo.status);
+		ps.setInt(5, userInfo.userID);
 		ps.execute();
 	}
 

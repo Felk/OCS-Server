@@ -77,8 +77,14 @@ public class User {
 	}
 
 	public void setColor(int color, OCSDatabase db) throws SQLException {
-		db.setColor(userInfo.userID, color);
 		userInfo.color = color;
+		db.updateUserInfo(userInfo);
+		update();
+	}
+	
+	public void setStatus(String status, OCSDatabase db) throws SQLException {
+		userInfo.status = status;
+		db.updateUserInfo(userInfo);
 		update();
 	}
 
