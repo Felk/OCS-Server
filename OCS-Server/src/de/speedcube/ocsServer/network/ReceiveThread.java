@@ -42,7 +42,7 @@ public class ReceiveThread extends Thread {
 				}
 
 				Packet receivedPacket = Packet.getPacket(packetID).newInstance();
-				//System.out.println("received packet: " + receivedPacket.getName() + " ID: " + receivedPacket.packetID + " (" + (receivedBytes) + " bytes)");
+				System.out.println("received packet: " + receivedPacket.getName() + " ID: " + receivedPacket.packetID + " (" + (receivedBytes) + " bytes)");
 				receivedPacket.packedData = buffer;
 				receivedPacket.unpack();
 

@@ -11,6 +11,7 @@ import de.speedcube.ocsServer.autoUpdater.UpdateServerThread;
 import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsServer.network.ServerThread;
 import de.speedcube.ocsServer.sql.OCSDatabase;
+import de.speedcube.ocsServer.userlistServer.UserlistServerThread;
 import de.speedcube.ocsUtilities.packets.Packet;
 import de.speedcube.ocsUtilities.packets.PacketDisconnect;
 
@@ -18,8 +19,11 @@ public class OCSServer {
 
 	public static final String version = "0";
 	public boolean running;
+	
 	public ServerThread serverThread;
 	public UpdateServerThread updateServerThread;
+	public UserlistServerThread userlistServerThread;
+	
 	public static Object packageReceiveNotify = new Object();
 	public OCSDatabase database;
 	public Userlist userlist;
@@ -64,6 +68,7 @@ public class OCSServer {
 
 		serverThread = new ServerThread(34543, packageReceiveNotify);
 		updateServerThread = new UpdateServerThread();
+		userlistServerThread = new UserlistServerThread(userlist);
 
 		try {
 
@@ -121,6 +126,7 @@ public class OCSServer {
 
 		serverThread.stopServer();
 		updateServerThread.stopServer();
+		userlistServerThread.stopServer();
 		database.closeConnection();
 
 	}

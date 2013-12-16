@@ -14,6 +14,7 @@ import de.speedcube.ocsUtilities.packets.PacketUserlist;
 public class Userlist {
 
 	private ArrayList<User> users = new ArrayList<User>();
+	private String jsonString = "[]";
 
 	public Userlist() {
 
@@ -88,7 +89,8 @@ public class Userlist {
 
 	public void updateUserlist() {
 		broadcastData(toPacket());
-		writeUserlistFile();
+		//writeUserlistFile();
+		updateJsonString();
 	}
 
 	public void writeUserlistFile() {
@@ -122,6 +124,22 @@ public class Userlist {
 		
 		return sb.toString();
 		
+	}
+	
+	public void updateJsonString() {
+		StringBuilder s = new StringBuilder();
+		s.append("[");
+		for (int i = 0; i < users.size(); i++) {
+			if (i>0) s.append(",");
+			User u = users.get(i);
+			s.append("{\"username\":\""+u.userInfo.username+"\",\"color\":\""+Integer.toHexString(u.userInfo.color)+"\"}");
+		}
+		s.append("]");
+		jsonString = s.toString();
+	}
+	
+	public String getJsonString() {
+		return jsonString;
 	}
 	
 	public void removeUser(User u) {
