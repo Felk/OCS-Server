@@ -17,7 +17,6 @@ public class UserlistServerThread extends Thread {
 		this.userlist = userlist;
 		try {
 			serverSocket = new ServerSocket(34743);
-			System.out.println("Created userlist server");
 			clients = new ArrayList<UserlistClient>();
 		} catch (IOException e) {
 			System.out.println("Failed to start userlist server");

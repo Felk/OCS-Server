@@ -25,13 +25,10 @@ public class UserlistClient extends Thread {
 			out = new BufferedOutputStream(socket.getOutputStream());
 
 			String json = userlist.getJsonString()+"\n";
-			System.out.println("json: " + json);
 
 			out.write(json.getBytes("utf-8"));
 
 			out.flush();
-
-			System.out.println("Sent userlist, aborting connection...");
 
 			stopClient();
 		} catch (IOException e) {
@@ -54,7 +51,6 @@ public class UserlistClient extends Thread {
 	public void stopClient() {
 		try {
 			socket.close();
-			System.out.println("Userlist Socket closed");
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Could not close socket for UserlistClient.");
