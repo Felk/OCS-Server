@@ -132,7 +132,7 @@ public class Userlist {
 		for (int i = 0; i < users.size(); i++) {
 			if (i>0) s.append(",");
 			User u = users.get(i);
-			s.append("{\"username\":\""+u.userInfo.username+"\",\"color\":\""+Integer.toHexString(u.userInfo.color)+"\"}");
+			s.append("{\"username\":\""+u.userInfo.username+"\",\"color\":\""+u.userInfo.getHexColor()+"\"}");
 		}
 		s.append("]");
 		jsonString = s.toString();

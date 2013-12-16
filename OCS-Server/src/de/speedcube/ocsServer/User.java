@@ -49,6 +49,7 @@ public class User {
 		PacketUserInfo packet = new PacketUserInfo();
 		packet.addUserInfo(userInfo);
 		userlist.broadcastData(packet);
+		userlist.updateJsonString();
 	}
 
 	public void setClient(Client c) {
