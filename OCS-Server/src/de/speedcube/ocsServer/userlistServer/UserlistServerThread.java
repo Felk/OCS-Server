@@ -30,7 +30,6 @@ public class UserlistServerThread extends Thread {
 		while (running) {
 			try {
 				clients.add(new UserlistClient(serverSocket.accept(), userlist));
-				System.out.println("added client");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

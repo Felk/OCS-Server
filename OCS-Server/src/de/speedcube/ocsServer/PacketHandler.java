@@ -97,7 +97,7 @@ public class PacketHandler {
 
 		} else {
 			PacketLoginError packetFailed = new PacketLoginError();
-			packetFailed.msg = "Failed to log in!";
+			packetFailed.msg = "login.failed";
 			client.sendPacket(packetFailed);
 		}
 	}
