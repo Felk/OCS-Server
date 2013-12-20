@@ -10,6 +10,7 @@ import java.util.Properties;
 import de.speedcube.ocsServer.autoUpdater.UpdateServerThread;
 import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsServer.network.ServerThread;
+import de.speedcube.ocsServer.parties.Party;
 import de.speedcube.ocsServer.sql.OCSDatabase;
 import de.speedcube.ocsServer.userlistServer.UserlistServerThread;
 import de.speedcube.ocsUtilities.packets.Packet;
@@ -31,10 +32,38 @@ public class OCSServer {
 
 	public OCSServer() {
 		userlist = new Userlist();
+		
+		/*User u = new User(null);
+		User u2 = new User(null);
+		u.userInfo.username = "test";
+		u.userInfo.userID = 1;
+		u2.userInfo.username = "test2";
+		u2.userInfo.userID = 2;
+		Party party = new Party(4, 2, userlist);
+		party.addUser(u);
+		party.addUser(u2);
+		party.start();
+		party.update();
+		party.setTime(u, 30);
+		party.setTime(u2, 30);
+		party.update();
+		party.setTime(u, 10);
+		party.setTime(u2, 10);
+		party.update();
+		party.setTime(u, 13);
+		party.setTime(u2, 14);
+		party.update();
+		party.setTime(u, 17);
+		party.setTime(u2, 18);
+		party.update();
+		if (party.isOver()) {
+			System.out.println("Party ist vorbei");
+			System.out.println(party.getDisplay());
+		}*/
 	}
 
 	public static void main(String[] args) {
-
+		
 		OCSServer server;
 		do {
 			server = new OCSServer();

@@ -33,6 +33,10 @@ public class Userlist {
 		}
 		return null;
 	}
+	
+	public boolean hasUser(User u) {
+		return users.contains(u);
+	}
 
 	public boolean addUser(User user, Client client) {
 		user.setClient(client);
