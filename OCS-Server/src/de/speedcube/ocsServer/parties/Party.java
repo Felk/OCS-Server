@@ -5,6 +5,7 @@ import java.util.Map;
 
 import de.speedcube.ocsServer.User;
 import de.speedcube.ocsServer.Userlist;
+import de.speedcube.ocsUtilities.PartyResultSet;
 
 public class Party {
 
@@ -22,7 +23,7 @@ public class Party {
 	private String scramble;
 	
 	private PartyRound[] rounds;
-	private ResultSet[] results;
+	private PartyResultSet[] results;
 
 	private ArrayList<User> users;
 	private Userlist userlist;
@@ -71,7 +72,7 @@ public class Party {
 		User[] u_array = new User[users.size()];
 		u_array = users.toArray(u_array);
 		Average average = new Average(u_array, rounds, rounds_counting);
-		results = new ResultSet[average.getResults().size()];
+		results = new PartyResultSet[average.getResults().size()];
 		int c = 0;
 		for (Map.Entry<User, Integer> entry : average.getResults().entrySet()) {
 			User user = entry.getKey();
@@ -80,7 +81,7 @@ public class Party {
 			for (int i = 0; i < rounds.length; i++) {
 				times[i] = rounds[i].getTime(user);
 			}
-			results[c] = new ResultSet(user.userInfo.userID, times, value);
+			results[c] = new PartyResultSet(user.userInfo.userID, times, value);
 			c++;
 		}
 		over = true;
@@ -106,7 +107,7 @@ public class Party {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("Partyergebnisse:");
-		for (ResultSet result : results) {
+		for (PartyResultSet result : results) {
 			sb.append('\n');
 			User user = getUser(result.getUserID());
 			int average = result.getAverage();
