@@ -45,6 +45,13 @@ public class PacketHandler {
 					return;
 				}
 			}
+			if (client.user.userInfo.rank >= Userranks.DEV) {
+				// Wenn DEV
+				if (p instanceof PacketSound) {
+					server.userlist.broadcastData(p);
+					return;
+				}
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -59,7 +66,7 @@ public class PacketHandler {
 
 		Party party = server.parties.getParty(p.partyID);
 		if (party == null) {
-			client.sendSystemMessage("party.join.fail");
+			client.sendSystemMessage("party.join.fail.not_existent");
 			return;
 		}
 		if (!party.isOpen()) {
@@ -95,7 +102,7 @@ public class PacketHandler {
 
 		Party party = server.parties.getParty(p.partyID);
 		if (party == null) {
-			client.sendSystemMessage("party.time_fail");
+			client.sendSystemMessage("party.time_fail.not_existent");
 			return;
 		}
 		if (!party.isRunning()) {
@@ -165,7 +172,7 @@ public class PacketHandler {
 
 		} else {
 			PacketLoginError packetFailed = new PacketLoginError();
-			packetFailed.msg = "login.failed";
+			packetFailed.msg = "login.fail";
 			client.sendPacket(packetFailed);
 		}
 	}
