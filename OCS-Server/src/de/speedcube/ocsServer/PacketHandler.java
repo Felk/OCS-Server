@@ -5,7 +5,9 @@ import java.sql.SQLException;
 import de.speedcube.ocsServer.chat.Chat;
 import de.speedcube.ocsServer.chat.Chatmessage;
 import de.speedcube.ocsServer.network.Client;
+import de.speedcube.ocsServer.parties.Party;
 import de.speedcube.ocsUtilities.Config;
+import de.speedcube.ocsUtilities.PartyTypes;
 import de.speedcube.ocsUtilities.Userranks;
 import de.speedcube.ocsUtilities.packets.*;
 import de.speedcube.ocsUtilities.security.RandomString;
@@ -32,6 +34,15 @@ public class PacketHandler {
 				if (p instanceof PacketChat) {
 					handleChatPacket(server, client, (PacketChat) p);
 					return;
+				} else if (p instanceof PacketPartyJoin) {
+					handlePartyJoinPacket(server, client, (PacketPartyJoin) p);
+					return;
+				} else if (p instanceof PacketPartyCreate) {
+					handlePartyCreatePacket(server, client, (PacketPartyCreate) p);
+					return;
+				} else if (p instanceof PacketPartyTime) {
+					handlePartyTimePacket(server, client, (PacketPartyTime) p);
+					return;
 				}
 			}
 
@@ -42,6 +53,64 @@ public class PacketHandler {
 
 		System.out.println("Packet not handled: " + p.getName());
 
+	}
+
+	private static void handlePartyJoinPacket(OCSServer server, Client client, PacketPartyJoin p) {
+
+		Party party = server.parties.getParty(p.partyID);
+		if (party == null) {
+			client.sendSystemMessage("party.join.fail");
+			return;
+		}
+		if (!party.isOpen()) {
+			client.sendSystemMessage("party.join_fail.running");
+			return;
+		}
+		// If already in a party
+		if (server.parties.getParty(client.user) != null) {
+			client.sendSystemMessage("party.join_fail.already_in_party");
+			return;
+		}
+
+		party.addUser(client.user);
+		party.update();
+		server.userlist.broadcastData(party.toPacket());
+
+	}
+
+	private static void handlePartyCreatePacket(OCSServer server, Client client, PacketPartyCreate p) {
+
+		if (p.rounds <= 0 || p.rounds_counting <= 0 || p.rounds_counting > p.rounds || !PartyTypes.has(p.type)) {
+			client.sendSystemMessage("party.create_fail");
+			return;
+		}
+
+		Party party = server.parties.newParty(client.user.userInfo.userID, p.type, p.rounds, p.rounds_counting, p.name, p.scramble);
+		server.userlist.broadcastData(server.parties.toPacket());
+		server.userlist.broadcastData(party.toPacket());
+
+	}
+	
+	private static void handlePartyTimePacket(OCSServer server, Client client, PacketPartyTime p) {
+
+		Party party = server.parties.getParty(p.partyID);
+		if (party == null) {
+			client.sendSystemMessage("party.time_fail");
+			return;
+		}
+		if (!party.isRunning()) {
+			client.sendSystemMessage("party.time_fail.not_running");
+			return;
+		}
+		if (!party.hasUser(client.user)) {
+			client.sendSystemMessage("party.time_fail.not_in_party");
+			return;
+		}
+
+		party.setTime(client.user, p.time);
+		party.update();
+		server.userlist.broadcastData(party.toPacket());
+		
 	}
 
 	public static void handleSaltGetPacket(OCSServer server, Client client, PacketSaltGet packet) throws SQLException {
@@ -60,7 +129,6 @@ public class PacketHandler {
 	}
 
 	public static void handleLoginPacket(OCSServer server, Client client, PacketLogin packet) throws SQLException {
-
 
 		User user = server.database.getUser(client.user.userInfo.username, packet.password);
 

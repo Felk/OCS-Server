@@ -10,7 +10,7 @@ import java.util.Properties;
 import de.speedcube.ocsServer.autoUpdater.UpdateServerThread;
 import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsServer.network.ServerThread;
-import de.speedcube.ocsServer.parties.Party;
+import de.speedcube.ocsServer.parties.PartyContainer;
 import de.speedcube.ocsServer.sql.OCSDatabase;
 import de.speedcube.ocsServer.userlistServer.UserlistServerThread;
 import de.speedcube.ocsUtilities.packets.Packet;
@@ -25,6 +25,8 @@ public class OCSServer {
 	public UpdateServerThread updateServerThread;
 	public UserlistServerThread userlistServerThread;
 	
+	public PartyContainer parties;
+	
 	public static Object packageReceiveNotify = new Object();
 	public OCSDatabase database;
 	public Userlist userlist;
@@ -32,7 +34,7 @@ public class OCSServer {
 
 	public OCSServer() {
 		userlist = new Userlist();
-		
+		parties = new PartyContainer(userlist);
 		/*User u = new User(null);
 		User u2 = new User(null);
 		u.userInfo.username = "test";
