@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import de.speedcube.ocsServer.User;
 import de.speedcube.ocsUtilities.Config;
 import de.speedcube.ocsUtilities.UserInfo;
 import de.speedcube.ocsUtilities.Userranks;
@@ -76,7 +75,7 @@ public class OCSDatabase {
 		return isOk;
 	}
 
-	public User getUser(String username, String password) throws SQLException {
+	public UserInfo getUserInfo(String username, String password) throws SQLException {
 		PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM " + PREFIX + "users WHERE username = ? LIMIT 1");
 
 		ps.setString(1, username);
@@ -91,7 +90,7 @@ public class OCSDatabase {
 		// The mighty login password equality check
 		if (!hashed_password.equals(original_password)) return null;
 
-		return new User(null, result.getInt("id"), result.getString("username"), result.getInt("rank"), result.getInt("color"), result.getString("status"));
+		return new UserInfo(result.getInt("id"), result.getString("username"), result.getInt("rank"), result.getInt("color"), result.getString("status"));
 	}
 
 	public boolean userExists(String username) throws SQLException {

@@ -5,45 +5,50 @@ import java.util.ArrayList;
 
 import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsServer.sql.OCSDatabase;
-import de.speedcube.ocsUtilities.packets.PacketLogout;
+import de.speedcube.ocsUtilities.packets.PacketChannelEnter;
 import de.speedcube.ocsUtilities.packets.PacketUserInfo;
 import de.speedcube.ocsUtilities.UserInfo;
 
 public class User {
 
-	public Userlist userlist;
+	private final Userlist userlist;
 	private Client client;
-	public String salt = "";
+	private String salt = "";
 	public UserInfo userInfo = new UserInfo();
-	public ArrayList<String> channels = new ArrayList<String>();
+	private ArrayList<String> channels = new ArrayList<String>();
 
-	public User(Client client) {
+	public User(Client client, Userlist userlist, UserInfo userInfo) {
 		setClient(client);
-	}
-
-	public User(Userlist userlist, int id, String username, int rank, int color, String status) {
-		this.userInfo = new UserInfo(id, username, rank, color, status);
 		this.userlist = userlist;
+		this.userInfo = userInfo;
+	}
+	
+	public User(Client client, Userlist userlist, int id, String username, int rank, int color, String status) {
+		this(client, userlist, new UserInfo(id, username, rank, color, status));
 	}
 
-	public void remove() {
-		if (userlist != null) {
-			userlist.removeUser(this);
-			userlist.updateUserlist();
+	/*private void remove() throws NullPointerException {
+		if (userlist == null) {
+			throw new NullPointerException();
 		}
+		userlist.logoutUser(this);
+		userlist.updateUserlist();
 		userInfo = new UserInfo();
-	}
+	}*/
 
 	public void closeConnection() {
 		if (client != null) client.stopClient();
 	}
 
-	public void kick() {
-		PacketLogout packetLogout = new PacketLogout();
-		packetLogout.msg = "system.msg.logout";
-		client.sendPacket(packetLogout);
+	/*public void logout() {
+		if (getClient(true) != null) {
+			PacketLogout packetLogout = new PacketLogout();
+			packetLogout.msg = "system.msg.logout";
+			client.sendPacket(packetLogout);
+
+		}
 		remove();
-	}
+	}*/
 
 	public void update() {
 		PacketUserInfo packet = new PacketUserInfo();
@@ -52,17 +57,18 @@ public class User {
 		userlist.updateJsonString();
 	}
 
-	public void setClient(Client c) {
+	private void setClient(Client c) {
 		this.client = c;
 		if (c != null) c.user = this;
 	}
 
-	public Client getClient() {
+	public Client getClient(boolean mustBeConnected) {
+		if (client != null) if (mustBeConnected && !client.connected) return null;
 		return client;
 	}
 
-	public void setUserlist(Userlist userlist) {
-		this.userlist = userlist;
+	public Client getClient() {
+		return getClient(false);
 	}
 
 	public void leaveChannel(String channel) {
@@ -72,8 +78,15 @@ public class User {
 
 	public boolean enterChannel(String channel) {
 		if (!channels.contains(channel)) channels.add(channel);
+		PacketChannelEnter p = new PacketChannelEnter();
+		p.chatChannel = channel;
+		getClient().sendPacket(p);
 		update();
 		return true;
+	}
+
+	public boolean isInChannel(String channel) {
+		return channels.contains(channel);
 	}
 
 	public void setColor(int color, OCSDatabase db) throws SQLException {
@@ -81,11 +94,27 @@ public class User {
 		db.updateUserInfo(userInfo);
 		update();
 	}
-	
+
 	public void setStatus(String status, OCSDatabase db) throws SQLException {
 		userInfo.status = status;
 		db.updateUserInfo(userInfo);
 		update();
+	}
+
+	public String getSalt() {
+		return salt;
+	}
+
+	public void setSalt(String salt) {
+		this.salt = salt;
+	}
+
+	public ArrayList<String> getChannels() {
+		return channels;
+	}
+	
+	public void logout() {
+		userlist.logoutUser(this);
 	}
 
 }

@@ -22,7 +22,7 @@ public class Client {
 	public boolean connectionInfoReceived = false;
 	public boolean connectionInfoSent = false;
 	private Object receiveNotify;
-	public User user = new User(null);
+	public User user = null;
 	
 	public String closeMessage = "";
 
@@ -85,6 +85,7 @@ public class Client {
 	public void sendSystemMessage(String msg, String... values) {
 		PacketSystemMessage p = new PacketSystemMessage();
 		p.msg = msg;
+		p.global = true;
 		p.values = values;
 		p.timestamp = System.currentTimeMillis();
 		sendPacket(p);
@@ -97,7 +98,7 @@ public class Client {
 
 		sender.stopThread();
 		
-		user.remove();
+		user.logout();
 		
 		//if (user != null )server.broadcastData(user.userlist.toPacket());
 

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsUtilities.UserInfo;
 import de.speedcube.ocsUtilities.packets.Packet;
+import de.speedcube.ocsUtilities.packets.PacketLogout;
 import de.speedcube.ocsUtilities.packets.PacketSystemMessage;
 import de.speedcube.ocsUtilities.packets.PacketUserlist;
 
@@ -33,21 +34,19 @@ public class Userlist {
 		}
 		return null;
 	}
-	
+
 	public boolean hasUser(User u) {
 		return users.contains(u);
 	}
 
-	public boolean addUser(User user, Client client) {
-		user.setClient(client);
-		user.setUserlist(this);
-		return addUser(user);
-	}
-
-	public boolean addUser(User user) {
-		if (users.contains(user)) return false;
+	public User addUser(UserInfo userInfo, Client client) {
+		User user = new User(client, this, userInfo);
+		//if (users.contains(user)) return false;
+		//user.setClient(client);
+		//user.setUserlist(this);
 		users.add(user);
-		return true;
+		//return true;
+		return user;
 	}
 
 	public PacketUserlist toPacket() {
@@ -78,17 +77,25 @@ public class Userlist {
 		for (User u : users)
 			u.getClient().sendPacket(packet);
 	}
-	
-	public void broadcastSystemMessage(String msg) {
-		broadcastSystemMessage(msg, new String[]{});
+
+	public void broadcastSystemMessage(String msg, String channel, boolean global) {
+		broadcastSystemMessage(msg, channel, global, new String[] {});
 	}
-	
-	public void broadcastSystemMessage(String msg, String... values) {
+
+	public void broadcastSystemMessage(String msg, String channel, boolean global, String... values) {
 		PacketSystemMessage p = new PacketSystemMessage();
 		p.msg = msg;
+		p.chatChannel = channel;
+		p.global = global;
 		p.values = values;
 		p.timestamp = System.currentTimeMillis();
-		broadcastData(p);
+		if (global) {
+			broadcastData(p);
+		} else {
+			for (User u : users) {
+				if (u.isInChannel(channel)) u.getClient().sendPacket(p);
+			}
+		}
 	}
 
 	public void updateUserlist() {
@@ -117,36 +124,50 @@ public class Userlist {
 	}
 
 	public String toTxtString() {
-		
+
 		StringBuilder sb = new StringBuilder();
 		boolean first = true;
 		for (User u : users) {
 			if (!first) sb.append(",");
-			sb.append(u.userInfo.username+":"+Integer.toHexString(u.userInfo.color));
+			sb.append(u.userInfo.username + ":" + Integer.toHexString(u.userInfo.color));
 			first = false;
 		}
-		
+
 		return sb.toString();
-		
+
 	}
-	
+
 	public void updateJsonString() {
 		StringBuilder s = new StringBuilder();
 		s.append("[");
 		for (int i = 0; i < users.size(); i++) {
-			if (i>0) s.append(",");
+			if (i > 0) s.append(",");
 			User u = users.get(i);
-			s.append("{\"username\":\""+u.userInfo.username+"\",\"color\":\""+u.userInfo.getHexColor()+"\"}");
+			s.append("{\"username\":\"" + u.userInfo.username + "\",\"color\":\"" + u.userInfo.getHexColor() + "\"}");
 		}
 		s.append("]");
 		jsonString = s.toString();
 	}
-	
+
 	public String getJsonString() {
 		return jsonString;
 	}
-	
+
 	public void removeUser(User u) {
-		if (users.remove(u)) broadcastSystemMessage("chat.logout", u.userInfo.username);
+		for (String c : u.getChannels())
+			if (users.remove(u)) broadcastSystemMessage("chat.logout", c, false, u.userInfo.username);
+		updateUserlist();
+	}
+
+	public void logoutUser(User u) {
+		Client client = u.getClient(true);
+		if (client != null) {
+			PacketLogout packetLogout = new PacketLogout();
+			packetLogout.msg = "system.msg.logout";
+			client.sendPacket(packetLogout);
+
+		}
+		removeUser(u);
+		u.userInfo = new UserInfo();
 	}
 }

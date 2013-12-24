@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 import de.speedcube.ocsServer.User;
+import de.speedcube.ocsUtilities.PartyTimeTypes;
 import de.speedcube.ocsUtilities.PartyTypes;
 
 public class Average {
@@ -73,17 +74,17 @@ public class Average {
 			int min = (times.length - counting) / 2;
 			int max = (times.length - counting + 1) / 2 + counting;
 			for (int i = min; i < max; i++) {
-				if (times[i] < 0) return Party.DNF;
+				if (times[i] < 0) return PartyTimeTypes.DNF;
 				average += times[i];
 			}
 			average /= counting;
 		} else if (type == PartyTypes.BEST) {
-			average = Party.DNF;
+			average = PartyTimeTypes.DNF;
 			for (int i = 0; i < times.length; i++) {
 				if (times[i] >= 0 && times[i] < average) average = times[i];
 			}
 		}
-		if (average < 0) return Party.DNF;
+		if (average < 0) return PartyTimeTypes.DNF;
 		return average;
 	}
 

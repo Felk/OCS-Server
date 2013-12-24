@@ -8,6 +8,7 @@ import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsServer.parties.Party;
 import de.speedcube.ocsUtilities.Config;
 import de.speedcube.ocsUtilities.PartyTypes;
+import de.speedcube.ocsUtilities.UserInfo;
 import de.speedcube.ocsUtilities.Userranks;
 import de.speedcube.ocsUtilities.packets.*;
 import de.speedcube.ocsUtilities.security.RandomString;
@@ -29,6 +30,7 @@ public class PacketHandler {
 				return;
 
 			}
+			
 			if (client.user.userInfo.rank >= Userranks.NORMAL) {
 				// Wenn authentifiziert
 				if (p instanceof PacketChat) {
@@ -37,11 +39,21 @@ public class PacketHandler {
 				} else if (p instanceof PacketPartyJoin) {
 					handlePartyJoinPacket(server, client, (PacketPartyJoin) p);
 					return;
+				} else if (p instanceof PacketPartyLeave) {
+					handlePartyLeavePacket(server, client, (PacketPartyLeave) p);
+					return;
 				} else if (p instanceof PacketPartyCreate) {
 					handlePartyCreatePacket(server, client, (PacketPartyCreate) p);
 					return;
 				} else if (p instanceof PacketPartyTime) {
 					handlePartyTimePacket(server, client, (PacketPartyTime) p);
+					return;
+				} else if (p instanceof PacketLogout) {
+					System.out.println("GOT LOGOUT PACKET!");
+					client.user.logout();
+					return;
+				} else if (p instanceof PacketChannelWhisper) {
+					handleChannelWhisperPacket(server, client, (PacketChannelWhisper) p);
 					return;
 				}
 			}
@@ -62,11 +74,25 @@ public class PacketHandler {
 
 	}
 
+	private static void handleChannelWhisperPacket(OCSServer server, Client client, PacketChannelWhisper p) {
+		
+		User user2 = server.userlist.getUser(p.userID);
+		if (user2 == null) {
+			client.sendSystemMessage("chat.whisper_invalid_user");
+			return;
+		}
+		
+		String chatChannel = Chat.getNewWhisperChannel();
+		client.user.enterChannel(chatChannel);
+		user2.enterChannel(chatChannel);
+		
+	}
+
 	private static void handlePartyJoinPacket(OCSServer server, Client client, PacketPartyJoin p) {
 
 		Party party = server.parties.getParty(p.partyID);
 		if (party == null) {
-			client.sendSystemMessage("party.join.fail.not_existent");
+			client.sendSystemMessage("party.join_fail.not_existent");
 			return;
 		}
 		if (!party.isOpen()) {
@@ -78,8 +104,37 @@ public class PacketHandler {
 			client.sendSystemMessage("party.join_fail.already_in_party");
 			return;
 		}
+		
+		// confirm joining to client
+		client.sendPacket(p);
 
 		party.addUser(client.user);
+		party.update();
+		server.userlist.broadcastData(party.toPacket());
+
+	}
+	
+	private static void handlePartyLeavePacket(OCSServer server, Client client, PacketPartyLeave p) {
+
+		Party party = server.parties.getParty(p.partyID);
+		if (party == null) {
+			client.sendSystemMessage("party.leave_fail.not_existent");
+			return;
+		}
+		if (party.isOver()) {
+			client.sendSystemMessage("party.leave_fail.over");
+			return;
+		}
+		// If already in a party
+		if (server.parties.getParty(client.user) == null) {
+			client.sendSystemMessage("party.leave_fail.not_in_party");
+			return;
+		}
+		
+		// confirm leaving to client
+		client.sendPacket(p);
+
+		party.leaveUser(client.user);
 		party.update();
 		server.userlist.broadcastData(party.toPacket());
 
@@ -92,12 +147,12 @@ public class PacketHandler {
 			return;
 		}
 
-		Party party = server.parties.newParty(client.user.userInfo.userID, p.type, p.rounds, p.rounds_counting, p.name, p.scramble);
+		Party party = server.parties.newParty(client.user.userInfo.userID, p.type, p.rounds, p.rounds_counting, p.name, p.scrambleType);
 		server.userlist.broadcastData(server.parties.toPacket());
 		server.userlist.broadcastData(party.toPacket());
 
 	}
-	
+
 	private static void handlePartyTimePacket(OCSServer server, Client client, PacketPartyTime p) {
 
 		Party party = server.parties.getParty(p.partyID);
@@ -117,7 +172,7 @@ public class PacketHandler {
 		party.setTime(client.user, p.time);
 		party.update();
 		server.userlist.broadcastData(party.toPacket());
-		
+
 	}
 
 	public static void handleSaltGetPacket(OCSServer server, Client client, PacketSaltGet packet) throws SQLException {
@@ -137,17 +192,19 @@ public class PacketHandler {
 
 	public static void handleLoginPacket(OCSServer server, Client client, PacketLogin packet) throws SQLException {
 
-		User user = server.database.getUser(client.user.userInfo.username, packet.password);
+		UserInfo userInfo = server.database.getUserInfo(client.user.userInfo.username, packet.password);
 
-		if (user != null) {
+		if (userInfo != null) {
 			// SUCCESSFULL LOGIN
-			User existing = server.userlist.getUser(user.userInfo.username);
+			User existing = server.userlist.getUser(userInfo.username);
 			if (existing != null) {
-				existing.kick();
-				// No userlist update btw.
+				existing.logout();
+				// Userlist update btw.
+				// Overlog => 2 Userlist updates
 			}
 
-			server.userlist.addUser(user, client);
+			User user = server.userlist.addUser(userInfo, client);
+			user.enterChannel(Chat.DEFAULT_CHANNEL);
 
 			PacketLoginSuccess packetSuccess = new PacketLoginSuccess();
 			packetSuccess.username = client.user.userInfo.username;
@@ -166,9 +223,9 @@ public class PacketHandler {
 			pUserInfo = new PacketUserInfo();
 			for (User u : server.userlist.getUsers())
 				pUserInfo.addUserInfo(u.userInfo);
-			server.userlist.broadcastData(pUserInfo);
+			client.sendPacket(pUserInfo);
 
-			server.userlist.broadcastSystemMessage("chat.login", client.user.userInfo.username);
+			server.userlist.broadcastSystemMessage("chat.login", Chat.DEFAULT_CHANNEL, false, client.user.userInfo.username);
 
 		} else {
 			PacketLoginError packetFailed = new PacketLoginError();
@@ -207,6 +264,8 @@ public class PacketHandler {
 
 	public static void handleChatPacket(OCSServer server, Client client, PacketChat packet) {
 
+		System.out.println("Got chat message, channel: "+packet.chatChannel);
+		
 		Chatmessage msg = new Chatmessage(client.user.userInfo.userID, packet.chatChannel, packet.text, System.currentTimeMillis());
 
 		Chat.parseMessage(server, server.userlist, msg);

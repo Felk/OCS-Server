@@ -4,10 +4,13 @@ import de.speedcube.ocsServer.OCSServer;
 import de.speedcube.ocsServer.User;
 import de.speedcube.ocsServer.Userlist;
 import de.speedcube.ocsServer.chat.commands.Chatcommand;
+import de.speedcube.ocsUtilities.security.RandomString;
 
 public class Chat {
 
 	public static final int MAX_CHAT_LENGTH = 2000;
+	public static final char CHANNEL_WHISPER = '#';
+	public static final String DEFAULT_CHANNEL = "Main";
 
 	public static void parseMessage(OCSServer server, Userlist userlist, Chatmessage msg) {
 
@@ -54,7 +57,7 @@ public class Chat {
 	public static void broadcastMessage(Userlist userlist, Chatmessage msg) {
 
 		for (User u : userlist.getUsers()) {
-			if (msg.getChannel().isEmpty() || u.channels.contains(msg.getChannel())) {
+			if (u.isInChannel(msg.getChannel())) {
 				sendMessage(msg, u);
 			}
 		}
@@ -65,6 +68,7 @@ public class Chat {
 		sendMessage(msg, new User[] { user });
 	}
 	
+	// Not used. Client has to escape
 	public static String escapeHTML(String s) {
 		return s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 	}
@@ -74,6 +78,10 @@ public class Chat {
 		//msg.setText(escapeHTML(msg.getText()));
 		for (User u : users)
 			u.getClient().sendPacket(msg.toPacket());
+	}
+
+	public static String getNewWhisperChannel() {
+		return CHANNEL_WHISPER+RandomString.getNew(8);
 	}
 
 }

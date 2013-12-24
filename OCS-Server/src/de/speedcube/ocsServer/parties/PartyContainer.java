@@ -18,7 +18,7 @@ public class PartyContainer {
 
 	public Party newParty(int ownerID, byte type, int rounds, int rounds_counting, String name, String scramble) {
 		last_party_id++;
-		Party p = new Party(last_party_id, ownerID, type, rounds, rounds_counting, name, scramble, userlist);
+		Party p = new Party(last_party_id, ownerID, type, rounds, rounds_counting, name, userlist, scramble);
 		parties.add(p);
 		return p;
 	}

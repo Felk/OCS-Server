@@ -7,14 +7,10 @@ import de.speedcube.ocsServer.User;
 import de.speedcube.ocsServer.Userlist;
 import de.speedcube.ocsUtilities.PartyResultSet;
 import de.speedcube.ocsUtilities.PartyStates;
+import de.speedcube.ocsUtilities.PartyTimeTypes;
 import de.speedcube.ocsUtilities.packets.PacketPartyData;
 
 public class Party {
-
-	public static final int OFF = -1;
-	public static final int DNF = -2;
-	public static final int DNS = -3;
-	public static final int DNK = -4;
 
 	private byte state = PartyStates.OPEN;
 	private int ownerID;
@@ -25,24 +21,26 @@ public class Party {
 	private int rounds_num;
 	private int rounds_counting;
 	private String name;
-	private String scramble;
+	private String scrambleType;
+	private String[] scrambles;
 
 	private PartyRound[] rounds;
 	private PartyResultSet[] results;
 
 	private ArrayList<User> users;
+	private ArrayList<User> users_left;
 	private Userlist userlist;
 
-	public Party(int id, int ownerID, byte type, int rounds, int counting, String name, String scramble, Userlist userlist) {
+	public Party(int id, int ownerID, byte type, int rounds, int counting, String name, Userlist userlist, String scrambleType) {
 		this.id = id;
 		this.ownerID = ownerID;
 		this.type = type;
 		this.rounds_num = rounds;
 		this.rounds_counting = counting;
 		this.name = name;
-		this.scramble = scramble;
 		this.userlist = userlist;
 		this.rounds = new PartyRound[rounds_num];
+		this.scrambleType = scrambleType;
 
 		this.round_num = 0;
 		users = new ArrayList<User>();
@@ -56,8 +54,14 @@ public class Party {
 	}
 
 	public void addUser(User u) {
-		if (userlist.hasUser(u)) return;
+		if (userlist.hasUser(u) || users.contains(u)) return;
 		users.add(u);
+	}
+	
+	public void leaveUser(User u) {
+		if (!users.contains(u) || users_left.contains(u)) return;
+		users_left.add(u);
+		setTime(u, PartyTimeTypes.DNS);
 	}
 
 	public void update() {
@@ -72,7 +76,8 @@ public class Party {
 
 	private void nextRound() {
 		round_num++;
-		rounds[round_num - 1] = new PartyRound(users);
+		// TODO add scrambles
+		rounds[round_num - 1] = new PartyRound(users, "");
 	}
 
 	private boolean isRoundOver() {
@@ -88,6 +93,7 @@ public class Party {
 		u_array = users.toArray(u_array);
 		Average average = new Average(u_array, rounds, Math.min(rounds_counting, round_num), type);
 		results = new PartyResultSet[average.getResults().size()];
+		for (int i = 0; i < rounds.length; i++) scrambles[i] = rounds[i].getScramble();
 		int c = 0;
 		for (Map.Entry<User, Integer> entry : average.getResults().entrySet()) {
 			User user = entry.getKey();
@@ -127,7 +133,7 @@ public class Party {
 	}
 
 	public void updateOfflineUsers() {
-		getRound().updateOfflineUsers(userlist);
+		getRound().updateOffUsers(userlist, users_left);
 	}
 
 	public String getDisplay() {
@@ -160,18 +166,15 @@ public class Party {
 		packet.rounds = rounds_num;
 		packet.rounds_counting = rounds_counting;
 		packet.name = name;
-		packet.scramble = scramble;
 		packet.results = results;
 		packet.state = state;
+		packet.scrambleType = scrambleType;
+		packet.scrambles = scrambles;
 		return packet;
 	}
 
 	public String getName() {
 		return name;
-	}
-
-	public String getScramble() {
-		return scramble;
 	}
 
 	public int getID() {
@@ -184,5 +187,9 @@ public class Party {
 	
 	public int getType() {
 		return type;
+	}
+
+	public String getScrambleType() {
+		return scrambleType;
 	}
 }

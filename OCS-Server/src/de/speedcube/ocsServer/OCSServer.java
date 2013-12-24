@@ -18,7 +18,7 @@ import de.speedcube.ocsUtilities.packets.PacketDisconnect;
 
 public class OCSServer {
 
-	public static final String version = "0";
+	public static final String version = "0.85.1";
 	public boolean running;
 	
 	public ServerThread serverThread;
@@ -142,6 +142,8 @@ public class OCSServer {
 						packets.add(p);
 					for (Packet p : c.getData(Packet.CHAT_CHANNEL))
 						packets.add(p);
+					for (Packet p : c.getData(Packet.LOGIN_PAGE_CHANNEL))
+						packets.add(p);
 					for (Packet p : packets) {
 						PacketHandler.handlePackage(this, c, p);
 					}
@@ -158,7 +160,7 @@ public class OCSServer {
 		serverThread.stopServer();
 		updateServerThread.stopServer();
 		userlistServerThread.stopServer();
-		database.closeConnection();
+		if (database != null) database.closeConnection();
 
 	}
 
