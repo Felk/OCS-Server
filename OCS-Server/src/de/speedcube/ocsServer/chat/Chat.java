@@ -36,7 +36,7 @@ public class Chat {
 					} else {
 						msg.setText("");
 					}
-					msg = chatcommand.parse(server, msg);
+					msg = chatcommand.parseMessage(server, msg);
 				} else {
 					msg = null;
 					u.getClient().sendSystemMessage("chat.command.insufficient_rank", new String[]{command});

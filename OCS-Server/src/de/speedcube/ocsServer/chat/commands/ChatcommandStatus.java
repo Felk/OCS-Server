@@ -10,12 +10,11 @@ import de.speedcube.ocsUtilities.Userranks;
 public class ChatcommandStatus extends Chatcommand {
 
 	@Override
-	public Chatmessage parse(OCSServer server, Chatmessage msg) {
+	public Chatmessage parse(OCSServer server, User user, Chatmessage msg) {
 
 		// Database length
 		if (msg.getText().length() > 200) msg.setText(msg.getText().substring(0, 200));
 
-		User user = server.userlist.getUser(msg.getUserID());
 		try {
 			user.setStatus(msg.getText(), server.database);
 		} catch (SQLException e) {

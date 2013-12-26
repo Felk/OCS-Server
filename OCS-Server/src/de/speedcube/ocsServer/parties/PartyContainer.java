@@ -9,7 +9,7 @@ import de.speedcube.ocsUtilities.packets.PacketPartyList;
 public class PartyContainer {
 
 	private int last_party_id = 0;
-	private ArrayList<Party> parties;
+	private ArrayList<Party> parties = new ArrayList<Party>();
 	private Userlist userlist;
 
 	public PartyContainer(Userlist userlist) {
@@ -20,6 +20,8 @@ public class PartyContainer {
 		last_party_id++;
 		Party p = new Party(last_party_id, ownerID, type, rounds, rounds_counting, name, userlist, scramble);
 		parties.add(p);
+		p.init();
+		System.out.println("Added party! name: " + name);
 		return p;
 	}
 
@@ -32,7 +34,7 @@ public class PartyContainer {
 	public boolean hasParty(Party p) {
 		return parties.contains(p);
 	}
-	
+
 	public PacketPartyList toPacket() {
 		int[] ids = new int[parties.size()];
 		for (int i = 0; i < parties.size(); i++)
@@ -41,10 +43,19 @@ public class PartyContainer {
 		packet.partyIDs = ids;
 		return packet;
 	}
-	
+
 	public Party getParty(User user) {
-		for (Party p : parties) if (p.hasUser(user)) return p;
+		for (Party p : parties)
+			if (p.hasUser(user)) return p;
 		return null;
+	}
+	
+	public ArrayList<Party> getParties() {
+		return parties;
+	}
+	
+	public void leaveUser(User u) {
+		for (Party p : parties) p.leaveUser(u);
 	}
 
 }

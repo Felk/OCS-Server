@@ -10,10 +10,8 @@ import de.speedcube.ocsUtilities.Userranks;
 public class ChatcommandColor extends Chatcommand {
 
 	@Override
-	public Chatmessage parse(OCSServer server, Chatmessage msg) {
+	public Chatmessage parse(OCSServer server, User user, Chatmessage msg) {
 
-		User user = server.userlist.getUser(msg.getUserID());
-		
 		if (msg.getText().length() == 0) {
 			msg.setText("Meine Farbe ist "+user.userInfo.getHexColor());
 			return msg;

@@ -1,5 +1,7 @@
 package de.speedcube.ocsServer.parties;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -12,7 +14,7 @@ public class Average {
 	private PartyRound[] rounds;
 	private User[] users;
 	private int max;
-	private int min;
+	private int counting_num;
 	private byte type;
 
 	private TreeMap<User, Integer> results;
@@ -20,16 +22,12 @@ public class Average {
 	public Average(User[] users, PartyRound[] rounds, int counting, byte type) {
 		this.users = users;
 		this.rounds = rounds;
-		this.min = counting;
+		this.counting_num = counting;
 		this.type = type;
 		max = 0;
 		for (PartyRound pr : rounds)
 			if (pr != null) max++;
-		if (counting <= max && min > 0)
-			results = calculateAverage();
-		else {
-			results = null;
-		}
+		results = calculateAverage();
 	}
 
 	private TreeMap<User, Integer> calculateAverage() {
@@ -38,12 +36,22 @@ public class Average {
 
 		for (int i = 0; i < users.length; i++) {
 			User user = users[i];
-			int[] times = new int[max];
+			ArrayList<Integer> timesA = new ArrayList<Integer>();
 			for (int j = 0; j < max; j++) {
-				times[j] = rounds[j].getTime(user);
+				//if (rounds[j] == null) continue;
+				if (rounds[j].getTime(user) == null) continue;
+				timesA.add(rounds[j].getTime(user));
 			}
+
+			// Copy ArrayList to Array
+			int[] times = new int[timesA.size()];
+			for (int j = 0; j < timesA.size(); j++)
+				times[j] = timesA.get(j);
+
 			sortTimes(times);
-			averageMap.put(user, getAverage(times, min));
+			Integer average = getAverage(times, counting_num);
+			System.out.println("Times for " + user.userInfo.username + ": " + Arrays.toString(times) + ", average: " + average);
+			averageMap.put(user, average == null ? 0 : average);
 		}
 
 		TimeComparator tc = new TimeComparator(averageMap);
@@ -68,16 +76,28 @@ public class Average {
 	}
 
 	private Integer getAverage(int[] times, int counting) {
-		
+
+		if (counting == 0 || times.length == 0) return null;
+
+		int sub_counting = Math.round(times.length * (counting / rounds.length));
+		if (sub_counting < 1) sub_counting = 1;
+		int margin = times.length - sub_counting;
+
 		int average = 0;
 		if (type == PartyTypes.AVG) {
-			int min = (times.length - counting) / 2;
-			int max = (times.length - counting + 1) / 2 + counting;
+
+			int min = (int) Math.floor(margin / 2);
+			int max = (int) (times.length - Math.ceil(margin / 2));
+
+			//int min = (times.length - sub_counting) / 2;
+			//int max = (times.length - sub_counting + 1) / 2 + sub_counting;
+
+			max = Math.min(max, times.length);
 			for (int i = min; i < max; i++) {
 				if (times[i] < 0) return PartyTimeTypes.DNF;
 				average += times[i];
 			}
-			average /= counting;
+			average /= max - min;
 		} else if (type == PartyTypes.BEST) {
 			average = PartyTimeTypes.DNF;
 			for (int i = 0; i < times.length; i++) {

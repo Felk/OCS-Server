@@ -33,7 +33,7 @@ public class OCSServer {
 	private static boolean restart = false;
 
 	public OCSServer() {
-		userlist = new Userlist();
+		userlist = new Userlist(this);
 		parties = new PartyContainer(userlist);
 		/*User u = new User(null);
 		User u2 = new User(null);
@@ -143,6 +143,8 @@ public class OCSServer {
 					for (Packet p : c.getData(Packet.CHAT_CHANNEL))
 						packets.add(p);
 					for (Packet p : c.getData(Packet.LOGIN_PAGE_CHANNEL))
+						packets.add(p);
+					for (Packet p : c.getData(Packet.PARTY_CHANNEL))
 						packets.add(p);
 					for (Packet p : packets) {
 						PacketHandler.handlePackage(this, c, p);

@@ -10,7 +10,6 @@ import de.speedcube.ocsUtilities.packets.PacketConnectionInfo;
 import de.speedcube.ocsUtilities.packets.PacketDisconnect;
 import de.speedcube.ocsUtilities.packets.PacketSystemMessage;
 
-
 public class Client {
 	private Socket socket;
 	public boolean connected = false;
@@ -22,8 +21,9 @@ public class Client {
 	public boolean connectionInfoReceived = false;
 	public boolean connectionInfoSent = false;
 	private Object receiveNotify;
-	public User user = null;
-	
+	private User user;
+	public String tempUsername;
+
 	public String closeMessage = "";
 
 	public Client(Socket socket, ServerThread server, Object receiveNotify) {
@@ -74,14 +74,16 @@ public class Client {
 	}
 
 	public String getAdress() {
-		if (socket != null) { return socket.getInetAddress().getHostAddress() + ":" + socket.getPort(); }
+		if (socket != null) {
+			return socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
+		}
 		return "";
 	}
-	
+
 	public void sendSystemMessage(String msg) {
-		sendSystemMessage(msg, new String[]{});
+		sendSystemMessage(msg, new String[] {});
 	}
-	
+
 	public void sendSystemMessage(String msg, String... values) {
 		PacketSystemMessage p = new PacketSystemMessage();
 		p.msg = msg;
@@ -97,18 +99,27 @@ public class Client {
 		receiver.stopThread();
 
 		sender.stopThread();
-		
-		user.logout();
-		
+
+		if (user != null) user.logout();
+
 		//if (user != null )server.broadcastData(user.userlist.toPacket());
 
 	}
-	
+
 	public void disconnect(String msg) {
 		PacketDisconnect packet = new PacketDisconnect();
 		packet.msg = msg;
 		sendPacket(packet);
 		stopClient();
 	}
-	
+
+	public User getUser() {
+		if (user == null) System.out.println("returnung user==null!");
+		return user;
+	}
+
+	public void setUser(User u) {
+		this.user = u;
+	}
+
 }

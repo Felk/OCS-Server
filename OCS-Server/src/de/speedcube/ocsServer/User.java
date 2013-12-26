@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import de.speedcube.ocsServer.network.Client;
+import de.speedcube.ocsServer.parties.Party;
 import de.speedcube.ocsServer.sql.OCSDatabase;
 import de.speedcube.ocsUtilities.packets.PacketChannelEnter;
 import de.speedcube.ocsUtilities.packets.PacketUserInfo;
@@ -22,7 +23,7 @@ public class User {
 		this.userlist = userlist;
 		this.userInfo = userInfo;
 	}
-	
+
 	public User(Client client, Userlist userlist, int id, String username, int rank, int color, String status) {
 		this(client, userlist, new UserInfo(id, username, rank, color, status));
 	}
@@ -57,9 +58,20 @@ public class User {
 		userlist.updateJsonString();
 	}
 
+	public void updateEverything(OCSServer server) {
+		// Userlist, UserInfos, Parties, PartyInfos
+		PacketUserInfo pUserInfo = new PacketUserInfo();
+		for (User u : userlist.getUsers())
+			pUserInfo.addUserInfo(u.userInfo);
+		client.sendPacket(pUserInfo);
+		client.sendPacket(server.parties.toPacket());
+		for (Party p : server.parties.getParties())
+			client.sendPacket(p.toPacket());
+	}
+
 	private void setClient(Client c) {
 		this.client = c;
-		if (c != null) c.user = this;
+		if (c != null) c.setUser(this);
 	}
 
 	public Client getClient(boolean mustBeConnected) {
@@ -112,9 +124,18 @@ public class User {
 	public ArrayList<String> getChannels() {
 		return channels;
 	}
-	
+
 	public void logout() {
 		userlist.logoutUser(this);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) return true;
+		if (!(o instanceof User)) return false;
+		if (((User) o).userInfo == null) return false;
+		if (((User) o).userInfo.userID == userInfo.userID) return true;
+		return false;
 	}
 
 }

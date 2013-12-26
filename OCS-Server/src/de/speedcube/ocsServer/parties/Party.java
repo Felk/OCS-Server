@@ -27,8 +27,8 @@ public class Party {
 	private PartyRound[] rounds;
 	private PartyResultSet[] results;
 
-	private ArrayList<User> users;
-	private ArrayList<User> users_left;
+	private ArrayList<User> users = new ArrayList<User>();
+	private ArrayList<User> users_left = new ArrayList<User>();
 	private Userlist userlist;
 
 	public Party(int id, int ownerID, byte type, int rounds, int counting, String name, Userlist userlist, String scrambleType) {
@@ -41,23 +41,28 @@ public class Party {
 		this.userlist = userlist;
 		this.rounds = new PartyRound[rounds_num];
 		this.scrambleType = scrambleType;
+		this.scrambles = new String[rounds_num];
 
 		this.round_num = 0;
-		users = new ArrayList<User>();
 	}
 
 	public void start() {
-		if (state == PartyStates.OPEN) {
+		if (isOpen()) {
 			nextRound();
 			state = PartyStates.RUNNING;
 		}
 	}
 
-	public void addUser(User u) {
-		if (userlist.hasUser(u) || users.contains(u)) return;
-		users.add(u);
+	public boolean addUser(User u) {
+		if (!userlist.hasUser(u)) return false;
+		if (users_left.contains(u))
+			users_left.remove(u);
+		else
+			users.add(u);
+		System.out.println("Added user to party, " + u.userInfo.username + ", " + u.userInfo.userID);
+		return true;
 	}
-	
+
 	public void leaveUser(User u) {
 		if (!users.contains(u) || users_left.contains(u)) return;
 		users_left.add(u);
@@ -65,6 +70,7 @@ public class Party {
 	}
 
 	public void update() {
+		if (isOpen()) return;
 		getRound().update();
 		boolean isRoundOver = isRoundOver();
 		if (isRoundOver && round_num == rounds_num) {
@@ -72,6 +78,10 @@ public class Party {
 		} else if (isRoundOver && round_num < rounds_num) {
 			nextRound();
 		}
+	}
+
+	public void updateUsers() {
+		updateResults();
 	}
 
 	private void nextRound() {
@@ -88,27 +98,35 @@ public class Party {
 		state = PartyStates.OVER;
 	}
 
-	public void updateResults() {
+	private void updateResults() {
 		User[] u_array = new User[users.size()];
 		u_array = users.toArray(u_array);
-		Average average = new Average(u_array, rounds, Math.min(rounds_counting, round_num), type);
+		Average average = new Average(u_array, rounds, rounds_counting, type);
 		results = new PartyResultSet[average.getResults().size()];
-		for (int i = 0; i < rounds.length; i++) scrambles[i] = rounds[i].getScramble();
+		for (int i = 0; i < rounds.length && rounds[i] != null; i++)
+			scrambles[i] = rounds[i].getScramble();
 		int c = 0;
 		for (Map.Entry<User, Integer> entry : average.getResults().entrySet()) {
 			User user = entry.getKey();
-			int value = entry.getValue();
+			int value = (entry.getValue() == null) ? 0 : entry.getValue();
 			int[] times = new int[rounds_num];
 			for (int i = 0; i < rounds.length; i++) {
-				times[i] = rounds[i].getTime(user);
+				if (rounds[i] == null) {
+					if (i == 0) {
+						times = null;
+						break;
+					}
+					continue;
+				}
+				times[i] = (rounds[i].getTime(user) == null) ? PartyTimeTypes.DNS : rounds[i].getTime(user);
 			}
 			results[c] = new PartyResultSet(user.userInfo.userID, times, value);
 			c++;
 		}
 	}
-	
+
 	public boolean hasUser(User user) {
-		return users.contains(user);
+		return users.contains(user) && !users_left.contains(user);
 	}
 
 	public boolean isOver() {
@@ -124,11 +142,15 @@ public class Party {
 	}
 
 	private PartyRound getRound() {
-		return rounds[round_num - 1];
+		int index = round_num - 1;
+		if (index < 0) return null;
+		return rounds[index];
 	}
 
 	public void setTime(User user, int time) {
-		getRound().setTime(user, time);
+		PartyRound r = getRound();
+		if (r == null) return;
+		r.setTime(user, time);
 		updateResults();
 	}
 
@@ -170,6 +192,9 @@ public class Party {
 		packet.state = state;
 		packet.scrambleType = scrambleType;
 		packet.scrambles = scrambles;
+		//int[] us = new int[users.size()];
+		//for (int i = 0; i < users.size(); i++) us[i] = users.get(i).userInfo.userID;
+		//packet.users = us;
 		return packet;
 	}
 
@@ -180,16 +205,29 @@ public class Party {
 	public int getID() {
 		return id;
 	}
-	
+
 	public int getOwnerID() {
 		return ownerID;
 	}
-	
+
 	public int getType() {
 		return type;
 	}
 
 	public String getScrambleType() {
 		return scrambleType;
+	}
+
+	public void init() {
+		//update();
+		updateResults();
+	}
+
+	public boolean isOwner(User user) {
+		return user.userInfo.userID == ownerID;
+	}
+
+	public boolean hasLeft(User user) {
+		return users_left.contains(user);
 	}
 }

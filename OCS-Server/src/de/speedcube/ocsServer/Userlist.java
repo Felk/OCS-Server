@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsUtilities.UserInfo;
+import de.speedcube.ocsUtilities.Userranks;
 import de.speedcube.ocsUtilities.packets.Packet;
 import de.speedcube.ocsUtilities.packets.PacketLogout;
 import de.speedcube.ocsUtilities.packets.PacketSystemMessage;
@@ -16,9 +17,10 @@ public class Userlist {
 
 	private ArrayList<User> users = new ArrayList<User>();
 	private String jsonString = "[]";
+	private OCSServer server;
 
-	public Userlist() {
-
+	public Userlist(OCSServer server) {
+		this.server = server;
 	}
 
 	public User getUser(String username) {
@@ -89,6 +91,7 @@ public class Userlist {
 		p.global = global;
 		p.values = values;
 		p.timestamp = System.currentTimeMillis();
+		if (!p.isPacked()) p.pack();
 		if (global) {
 			broadcastData(p);
 		} else {
@@ -154,6 +157,7 @@ public class Userlist {
 	}
 
 	public void removeUser(User u) {
+		server.parties.leaveUser(u);
 		for (String c : u.getChannels())
 			if (users.remove(u)) broadcastSystemMessage("chat.logout", c, false, u.userInfo.username);
 		updateUserlist();
@@ -168,6 +172,6 @@ public class Userlist {
 
 		}
 		removeUser(u);
-		u.userInfo = new UserInfo();
+		u.userInfo.rank = Userranks.GUEST;
 	}
 }
