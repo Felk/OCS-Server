@@ -40,6 +40,10 @@ public class Userlist {
 	public boolean hasUser(User u) {
 		return users.contains(u);
 	}
+	
+	public boolean hasUser(int id) {
+		return (getUser(id) != null);
+	}
 
 	public User addUser(UserInfo userInfo, Client client) {
 		User user = new User(client, this, userInfo);
@@ -173,5 +177,6 @@ public class Userlist {
 		}
 		removeUser(u);
 		u.userInfo.rank = Userranks.GUEST;
+		server.parties.updateFinishedParties();
 	}
 }

@@ -50,7 +50,7 @@ public class Average {
 
 			sortTimes(times);
 			Integer average = getAverage(times, counting_num);
-			System.out.println("Times for " + user.userInfo.username + ": " + Arrays.toString(times) + ", average: " + average);
+			//System.out.println("Times for " + user.userInfo.username + ": " + Arrays.toString(times) + ", average: " + average);
 			averageMap.put(user, average == null ? 0 : average);
 		}
 
@@ -65,8 +65,8 @@ public class Average {
 	private void sortTimes(int[] times) {
 		int help;
 		for (int i = 0; i < times.length; i++) {
-			for (int j = i; j < times.length; j++) {
-				if (times[i] < 0 || times[i] > times[j]) {
+			for (int j = i + 1; j < times.length; j++) {
+				if ((times[i] < 0 || times[i] > times[j]) && times[j] >= 0) {
 					help = times[i];
 					times[i] = times[j];
 					times[j] = help;
@@ -79,7 +79,9 @@ public class Average {
 
 		if (counting == 0 || times.length == 0) return null;
 
-		int sub_counting = Math.round(times.length * (counting / rounds.length));
+		System.out.println("rounds length: " + rounds.length);
+
+		int sub_counting = (int) Math.round(times.length * (((double) counting) / rounds.length));
 		if (sub_counting < 1) sub_counting = 1;
 		int margin = times.length - sub_counting;
 
@@ -89,10 +91,12 @@ public class Average {
 			int min = (int) Math.floor(margin / 2);
 			int max = (int) (times.length - Math.ceil(margin / 2));
 
-			//int min = (times.length - sub_counting) / 2;
-			//int max = (times.length - sub_counting + 1) / 2 + sub_counting;
+			System.out.println("length: " + times.length + ", counting: " + counting);
+			System.out.println("sub: " + sub_counting + ", margin: " + margin);
+			System.out.println("Min: " + min + ", max: " + max);
 
 			max = Math.min(max, times.length);
+			System.out.println("sorted times: " + Arrays.toString(times));
 			for (int i = min; i < max; i++) {
 				if (times[i] < 0) return PartyTimeTypes.DNF;
 				average += times[i];
@@ -101,7 +105,7 @@ public class Average {
 		} else if (type == PartyTypes.BEST) {
 			average = PartyTimeTypes.DNF;
 			for (int i = 0; i < times.length; i++) {
-				if (times[i] >= 0 && times[i] < average) average = times[i];
+				if (times[i] >= 0 && (times[i] < average || average < 0)) average = times[i];
 			}
 		}
 		if (average < 0) return PartyTimeTypes.DNF;

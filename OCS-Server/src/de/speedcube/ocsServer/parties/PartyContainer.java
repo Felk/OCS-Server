@@ -1,6 +1,7 @@
 package de.speedcube.ocsServer.parties;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import de.speedcube.ocsServer.User;
 import de.speedcube.ocsServer.Userlist;
@@ -10,6 +11,7 @@ public class PartyContainer {
 
 	private int last_party_id = 0;
 	private ArrayList<Party> parties = new ArrayList<Party>();
+	private ArrayList<Party> parties_done = new ArrayList<Party>();
 	private Userlist userlist;
 
 	public PartyContainer(Userlist userlist) {
@@ -56,6 +58,18 @@ public class PartyContainer {
 	
 	public void leaveUser(User u) {
 		for (Party p : parties) p.leaveUser(u);
+	}
+	
+	public void updateFinishedParties() {
+		for (Iterator<Party> iter = parties.iterator(); iter.hasNext();) {
+			Party p = iter.next();
+			p.update();
+			if (p.isOver()) {
+				iter.remove();
+				parties_done.add(p);
+			}
+		}
+		userlist.broadcastData(toPacket());
 	}
 
 }

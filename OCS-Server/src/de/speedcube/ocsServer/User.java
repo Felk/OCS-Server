@@ -133,9 +133,17 @@ public class User {
 	public boolean equals(Object o) {
 		if (o == this) return true;
 		if (!(o instanceof User)) return false;
-		if (((User) o).userInfo == null) return false;
-		if (((User) o).userInfo.userID == userInfo.userID) return true;
+		User u = (User) o;
+		if (u.userInfo == userInfo) return true;
+		if (u.userInfo == null) return false;
+		if (u.userInfo.userID == userInfo.userID) return true;
 		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		if (userInfo == null) return 0;
+		return userInfo.userID;
 	}
 
 }

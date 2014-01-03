@@ -19,8 +19,8 @@ public class TimeComparator implements Comparator<User> {
 		Integer o2 = base.get(u2);
 		if (o1 == null) return -1;
 		if (o2 == null) return 1;
-		if (o2 > o1 || o1 < 0) return -1;
-		if (o1 > o2 || o2 < 0) return 1;
+		if (o2 > o1 || o2 < 0) return -1;
+		if (o1 > o2 || o1 < 0) return 1;
 		return 1;
 	}
 

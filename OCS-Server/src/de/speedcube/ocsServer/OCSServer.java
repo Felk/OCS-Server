@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import com.puzzletimer.scramblers.Scrambler;
+import com.puzzletimer.scramblers.ScramblerProvider;
+
 import de.speedcube.ocsServer.autoUpdater.UpdateServerThread;
 import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsServer.network.ServerThread;
@@ -20,13 +23,13 @@ public class OCSServer {
 
 	public static final String version = "0.85.1";
 	public boolean running;
-	
+
 	public ServerThread serverThread;
 	public UpdateServerThread updateServerThread;
 	public UserlistServerThread userlistServerThread;
-	
+
 	public PartyContainer parties;
-	
+
 	public static Object packageReceiveNotify = new Object();
 	public OCSDatabase database;
 	public Userlist userlist;
@@ -35,6 +38,15 @@ public class OCSServer {
 	public OCSServer() {
 		userlist = new Userlist(this);
 		parties = new PartyContainer(userlist);
+
+		/*ScramblerProvider provider = new ScramblerProvider();
+		long t1 = System.nanoTime();
+		//Scrambler scrambler = provider.get("RUBIKS-CUBE-RANDOM");
+		System.out.println(provider.get("RUBIKS-CUBE-RANDOM").getNextScramble().getRawSequence());
+		System.out.println(((System.nanoTime() - t1) / 1000000) + "ms");
+		System.out.println(provider.get("RUBIKS-CUBE-RANDOM").getNextScramble().getRawSequence());
+		System.out.println(((System.nanoTime() - t1) / 1000000) + "ms");*/
+
 		/*User u = new User(null);
 		User u2 = new User(null);
 		u.userInfo.username = "test";
@@ -65,7 +77,7 @@ public class OCSServer {
 	}
 
 	public static void main(String[] args) {
-		
+
 		OCSServer server;
 		do {
 			server = new OCSServer();
@@ -127,7 +139,7 @@ public class OCSServer {
 			System.out.println("Could not read connection properties file");
 			e.printStackTrace();
 		}
-		
+
 		while (running) {
 
 			try {
@@ -151,7 +163,7 @@ public class OCSServer {
 					}
 					packets.clear();
 				}
-				
+
 			} catch (InterruptedException e) {
 				running = false;
 				e.printStackTrace();

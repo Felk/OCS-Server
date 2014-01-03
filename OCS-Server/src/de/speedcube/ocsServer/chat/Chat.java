@@ -4,19 +4,20 @@ import de.speedcube.ocsServer.OCSServer;
 import de.speedcube.ocsServer.User;
 import de.speedcube.ocsServer.Userlist;
 import de.speedcube.ocsServer.chat.commands.Chatcommand;
+import de.speedcube.ocsUtilities.Config;
 import de.speedcube.ocsUtilities.security.RandomString;
 
 public class Chat {
 
 	public static final int MAX_CHAT_LENGTH = 2000;
-	public static final char CHANNEL_WHISPER = '#';
+	//public static final char CHANNEL_WHISPER = '#';
 	public static final String DEFAULT_CHANNEL = "Main";
 
 	public static void parseMessage(OCSServer server, Userlist userlist, Chatmessage msg) {
 
 		User u = userlist.getUser(msg.getUserID());
 		if (u == null) return;
-		
+
 		if (msg.getText().length() > MAX_CHAT_LENGTH) {
 			// send an error message?
 			return;
@@ -39,14 +40,14 @@ public class Chat {
 					msg = chatcommand.parseMessage(server, msg);
 				} else {
 					msg = null;
-					u.getClient().sendSystemMessage("chat.command.insufficient_rank", new String[]{command});
+					u.getClient().sendSystemMessage("chat.command.insufficient_rank", new String[] { command });
 				}
 			} else {
 				msg = null;
-				u.getClient().sendSystemMessage("chat.command.unknown", new String[]{command});
+				u.getClient().sendSystemMessage("chat.command.unknown", new String[] { command });
 			}
 		}
-		
+
 		// maybe parsed to null (errors, non-chat commands)
 		if (msg == null) return;
 
@@ -67,7 +68,7 @@ public class Chat {
 	public static void sendMessage(Chatmessage msg, User user) {
 		sendMessage(msg, new User[] { user });
 	}
-	
+
 	// Not used. Client has to escape
 	public static String escapeHTML(String s) {
 		return s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
@@ -81,7 +82,14 @@ public class Chat {
 	}
 
 	public static String getNewWhisperChannel() {
-		return CHANNEL_WHISPER+RandomString.getNew(8);
+		//return CHANNEL_WHISPER + RandomString.getNew(8);
+		return Config.CHAT_CHANNEL_SEPARATOR + RandomString.getNew(8);
+	}
+
+	public static String getVisibleChannelName(String channel) {
+		String[] split = channel.split(Config.CHAT_CHANNEL_SEPARATOR);
+		if (split.length == 0) return null;
+		return split[0];
 	}
 
 }

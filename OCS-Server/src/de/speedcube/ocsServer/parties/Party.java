@@ -5,10 +5,12 @@ import java.util.Map;
 
 import de.speedcube.ocsServer.User;
 import de.speedcube.ocsServer.Userlist;
+import de.speedcube.ocsUtilities.Config;
 import de.speedcube.ocsUtilities.PartyResultSet;
 import de.speedcube.ocsUtilities.PartyStates;
 import de.speedcube.ocsUtilities.PartyTimeTypes;
 import de.speedcube.ocsUtilities.packets.PacketPartyData;
+import de.speedcube.ocsUtilities.security.RandomString;
 
 public class Party {
 
@@ -31,6 +33,8 @@ public class Party {
 	private ArrayList<User> users_left = new ArrayList<User>();
 	private Userlist userlist;
 
+	public final String chatChannel;
+
 	public Party(int id, int ownerID, byte type, int rounds, int counting, String name, Userlist userlist, String scrambleType) {
 		this.id = id;
 		this.ownerID = ownerID;
@@ -44,6 +48,12 @@ public class Party {
 		this.scrambles = new String[rounds_num];
 
 		this.round_num = 0;
+		
+		this.chatChannel = newChatChannel();
+	}
+
+	private String newChatChannel() {
+		return "Party " + name + Config.CHAT_CHANNEL_SEPARATOR + RandomString.getNew(8);
 	}
 
 	public void start() {
@@ -71,6 +81,7 @@ public class Party {
 
 	public void update() {
 		if (isOpen()) return;
+		updateOffUsers();
 		getRound().update();
 		boolean isRoundOver = isRoundOver();
 		if (isRoundOver && round_num == rounds_num) {
@@ -154,8 +165,19 @@ public class Party {
 		updateResults();
 	}
 
-	public void updateOfflineUsers() {
+	public void updateOffUsers() {
 		getRound().updateOffUsers(userlist, users_left);
+		if (!userlist.hasUser(ownerID)) {
+			User u = getNextActiveUser();
+			if (u == null) {
+				userlist.broadcastSystemMessage("party.no_online_owner", chatChannel, true);
+				// TODO problem
+			} else {
+				this.ownerID = u.userInfo.userID;
+				userlist.broadcastSystemMessage("party.owner_changed", chatChannel, true, u.userInfo.username);
+				// TODO owner change
+			}
+		}
 	}
 
 	public String getDisplay() {
@@ -176,7 +198,7 @@ public class Party {
 
 	private User getUser(int id) {
 		for (User u : users)
-			if (u.userInfo.userID == id) return u;
+			if (u.userInfo.userID == id && !users_left.contains(u)) return u;
 		return null;
 	}
 
@@ -185,6 +207,7 @@ public class Party {
 		packet.partyID = id;
 		packet.ownerID = ownerID;
 		packet.type = type;
+		packet.round = round_num;
 		packet.rounds = rounds_num;
 		packet.rounds_counting = rounds_counting;
 		packet.name = name;
@@ -229,5 +252,12 @@ public class Party {
 
 	public boolean hasLeft(User user) {
 		return users_left.contains(user);
+	}
+
+	private User getNextActiveUser() {
+		for (User u : users) {
+			if (!users_left.contains(u)) return u;
+		}
+		return null;
 	}
 }

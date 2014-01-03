@@ -87,26 +87,27 @@ public class PacketHandler {
 			return;
 		}
 
-		String chatChannel = Chat.getNewWhisperChannel();
+		String chatChannel = client.getUser().userInfo.username + " > " + user2.userInfo.username + Chat.getNewWhisperChannel();
 		client.getUser().enterChannel(chatChannel);
 		user2.enterChannel(chatChannel);
 
 	}
 
 	private static void handlePartyJoinPacket(OCSServer server, Client client, PacketPartyJoin p) {
-
+		server.parties.updateFinishedParties();
 		Party party = server.parties.getParty(p.partyID);
 		if (party == null) {
 			client.sendSystemMessage("party.join_fail.not_existent");
 			return;
 		}
-		if (!party.isOpen() && !party.hasLeft(client.getUser())) {
-			client.sendSystemMessage("party.join_fail.running");
-			return;
-		}
 		// If already in a party
 		if (server.parties.getParty(client.getUser()) != null) {
 			client.sendSystemMessage("party.join_fail.already_in_party");
+			return;
+		}
+		// && !party.hasLeft(client.getUser())
+		if (!party.isOpen() && !party.hasLeft(client.getUser())) {
+			client.sendSystemMessage("party.join_fail.running");
 			return;
 		}
 
@@ -117,6 +118,8 @@ public class PacketHandler {
 		party.updateUsers();
 		party.update();
 		server.userlist.broadcastData(party.toPacket());
+		
+		client.getUser().enterChannel(party.chatChannel);
 
 	}
 
@@ -142,12 +145,18 @@ public class PacketHandler {
 
 		party.leaveUser(client.getUser());
 		party.update();
+		server.parties.updateFinishedParties();
 		server.userlist.broadcastData(party.toPacket());
 
 	}
 
 	private static void handlePartyCreatePacket(OCSServer server, Client client, PacketPartyCreate p) {
 
+		if (p.name.trim().isEmpty()) {
+			client.sendSystemMessage("party.create_fail.no_name");
+			return;
+		}
+		
 		if (p.rounds <= 0 || p.rounds_counting <= 0 || p.rounds_counting > p.rounds) {
 			client.sendSystemMessage("party.create_fail.invalid_rounds");
 			return;
@@ -161,6 +170,8 @@ public class PacketHandler {
 		Party party = server.parties.newParty(client.getUser().userInfo.userID, p.type, p.rounds, p.rounds_counting, p.name, p.scrambleType);
 		server.userlist.broadcastData(server.parties.toPacket());
 		server.userlist.broadcastData(party.toPacket());
+		
+		client.getUser().enterChannel(party.chatChannel);
 
 	}
 
@@ -181,11 +192,13 @@ public class PacketHandler {
 		}
 
 		party.setTime(client.getUser(), p.time);
+		System.out.println("Set time " + p.time + " for user " + client.getUser().userInfo.username + " in party " + party.getName());
 		party.update();
+		server.parties.updateFinishedParties();
 		server.userlist.broadcastData(party.toPacket());
 
 	}
-	
+
 	public static void handlePartyStartPacket(OCSServer server, Client client, PacketPartyStart p) {
 
 		Party party = server.parties.getParty(p.partyID);
