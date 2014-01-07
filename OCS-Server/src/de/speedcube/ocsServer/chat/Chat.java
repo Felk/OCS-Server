@@ -13,7 +13,7 @@ public class Chat {
 	//public static final char CHANNEL_WHISPER = '#';
 	public static final String DEFAULT_CHANNEL = "Main";
 
-	public static void parseMessage(OCSServer server, Userlist userlist, Chatmessage msg) {
+	public void parseMessage(OCSServer server, Userlist userlist, Chatmessage msg) {
 
 		User u = userlist.getUser(msg.getUserID());
 		if (u == null) return;
@@ -51,11 +51,11 @@ public class Chat {
 		// maybe parsed to null (errors, non-chat commands)
 		if (msg == null) return;
 
-		Chat.broadcastMessage(userlist, msg);
+		broadcastMessage(userlist, msg);
 
 	}
 
-	public static void broadcastMessage(Userlist userlist, Chatmessage msg) {
+	public void broadcastMessage(Userlist userlist, Chatmessage msg) {
 
 		for (User u : userlist.getUsers()) {
 			if (u.isInChannel(msg.getChannel())) {
@@ -65,28 +65,28 @@ public class Chat {
 
 	}
 
-	public static void sendMessage(Chatmessage msg, User user) {
+	public void sendMessage(Chatmessage msg, User user) {
 		sendMessage(msg, new User[] { user });
 	}
 
 	// Not used. Client has to escape
-	public static String escapeHTML(String s) {
+	public String escapeHTML(String s) {
 		return s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 	}
 
-	public static void sendMessage(Chatmessage msg, User[] users) {
+	public void sendMessage(Chatmessage msg, User[] users) {
 		// Escape HTML
 		//msg.setText(escapeHTML(msg.getText()));
 		for (User u : users)
 			u.getClient().sendPacket(msg.toPacket());
 	}
 
-	public static String getNewWhisperChannel() {
+	public String getNewWhisperChannel() {
 		//return CHANNEL_WHISPER + RandomString.getNew(8);
 		return Config.CHAT_CHANNEL_SEPARATOR + RandomString.getNew(8);
 	}
 
-	public static String getVisibleChannelName(String channel) {
+	public String getVisibleChannelName(String channel) {
 		String[] split = channel.split(Config.CHAT_CHANNEL_SEPARATOR);
 		if (split.length == 0) return null;
 		return split[0];

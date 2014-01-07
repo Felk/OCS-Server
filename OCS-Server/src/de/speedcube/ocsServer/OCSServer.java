@@ -11,6 +11,7 @@ import com.puzzletimer.scramblers.Scrambler;
 import com.puzzletimer.scramblers.ScramblerProvider;
 
 import de.speedcube.ocsServer.autoUpdater.UpdateServerThread;
+import de.speedcube.ocsServer.chat.Chat;
 import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsServer.network.ServerThread;
 import de.speedcube.ocsServer.parties.PartyContainer;
@@ -33,10 +34,12 @@ public class OCSServer {
 	public static Object packageReceiveNotify = new Object();
 	public OCSDatabase database;
 	public Userlist userlist;
+	public Chat chat;
 	private static boolean restart = false;
 
 	public OCSServer() {
 		userlist = new Userlist(this);
+		chat = new Chat();
 		parties = new PartyContainer(userlist);
 
 		/*ScramblerProvider provider = new ScramblerProvider();

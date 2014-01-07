@@ -87,7 +87,7 @@ public class PacketHandler {
 			return;
 		}
 
-		String chatChannel = client.getUser().userInfo.username + " > " + user2.userInfo.username + Chat.getNewWhisperChannel();
+		String chatChannel = client.getUser().userInfo.username + " > " + user2.userInfo.username + server.chat.getNewWhisperChannel();
 		client.getUser().enterChannel(chatChannel);
 		user2.enterChannel(chatChannel);
 
@@ -316,7 +316,7 @@ public class PacketHandler {
 
 		Chatmessage msg = new Chatmessage(client.getUser().userInfo.userID, packet.chatChannel, packet.text, System.currentTimeMillis());
 
-		Chat.parseMessage(server, server.userlist, msg);
+		server.chat.parseMessage(server, server.userlist, msg);
 
 	}
 
