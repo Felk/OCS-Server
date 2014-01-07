@@ -59,6 +59,12 @@ public class PacketHandler {
 					} else if (p instanceof PacketChannelWhisper) {
 						handleChannelWhisperPacket(server, client, (PacketChannelWhisper) p);
 						return;
+					} else if (p instanceof PacketChannelEnter) {
+						handleChannelEnterPacket(server, client, (PacketChannelEnter) p);
+						return;
+					} else if (p instanceof PacketChannelLeave) {
+						handleChannelLeavePacket(server, client, (PacketChannelLeave) p);
+						return;
 					}
 				}
 				if (client.getUser().userInfo.rank >= Userranks.DEV) {
@@ -79,11 +85,43 @@ public class PacketHandler {
 
 	}
 
+	private static void handleChannelEnterPacket(OCSServer server, Client client, PacketChannelEnter p) {
+		if (p.chatChannel.isEmpty()) {
+			client.sendSystemMessage("chat.channel.join_fail.empty_name", p.chatChannel);
+			return;
+		}
+		if (client.getUser().isInChannel(p.chatChannel)) {
+			client.sendSystemMessage("chat.channel.join_fail.already_in_channel", p.chatChannel);
+			return;
+		}
+		client.getUser().enterChannel(p.chatChannel);
+	}
+	
+	private static void handleChannelLeavePacket(OCSServer server, Client client, PacketChannelLeave p) {
+		if (p.chatChannel.equals(Chat.DEFAULT_CHANNEL)) {
+			client.sendSystemMessage("chat.channel.leave_fail.default_channel", p.chatChannel);
+			return;
+		}
+		if (p.chatChannel.isEmpty()) {
+			client.sendSystemMessage("chat.channel.leave_fail.empty_name", p.chatChannel);
+			return;
+		}
+		if (!client.getUser().isInChannel(p.chatChannel)) {
+			client.sendSystemMessage("chat.channel.leave_fail.not_in_channel", p.chatChannel);
+			return;
+		}
+		client.getUser().leaveChannel(p.chatChannel);
+	}
+
 	private static void handleChannelWhisperPacket(OCSServer server, Client client, PacketChannelWhisper p) {
 
 		User user2 = server.userlist.getUser(p.userID);
 		if (user2 == null) {
 			client.sendSystemMessage("chat.whisper_invalid_user");
+			return;
+		}
+		if (user2.equals(client.getUser())) {
+			client.sendSystemMessage("chat.whisper_self");
 			return;
 		}
 
@@ -118,7 +156,7 @@ public class PacketHandler {
 		party.updateUsers();
 		party.update();
 		server.userlist.broadcastData(party.toPacket());
-		
+
 		client.getUser().enterChannel(party.chatChannel);
 
 	}
@@ -156,7 +194,7 @@ public class PacketHandler {
 			client.sendSystemMessage("party.create_fail.no_name");
 			return;
 		}
-		
+
 		if (p.rounds <= 0 || p.rounds_counting <= 0 || p.rounds_counting > p.rounds) {
 			client.sendSystemMessage("party.create_fail.invalid_rounds");
 			return;
@@ -170,7 +208,7 @@ public class PacketHandler {
 		Party party = server.parties.newParty(client.getUser().userInfo.userID, p.type, p.rounds, p.rounds_counting, p.name, p.scrambleType);
 		server.userlist.broadcastData(server.parties.toPacket());
 		server.userlist.broadcastData(party.toPacket());
-		
+
 		client.getUser().enterChannel(party.chatChannel);
 
 	}

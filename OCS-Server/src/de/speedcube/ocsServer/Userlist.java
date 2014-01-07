@@ -40,7 +40,7 @@ public class Userlist {
 	public boolean hasUser(User u) {
 		return users.contains(u);
 	}
-	
+
 	public boolean hasUser(int id) {
 		return (getUser(id) != null);
 	}
@@ -162,8 +162,8 @@ public class Userlist {
 
 	public void removeUser(User u) {
 		server.parties.leaveUser(u);
-		for (String c : u.getChannels())
-			if (users.remove(u)) broadcastSystemMessage("chat.logout", c, false, u.userInfo.username);
+		if (users.remove(u)) for (String c : u.getChannels())
+			broadcastSystemMessage("chat.logout", c, false, u.userInfo.username);
 		updateUserlist();
 	}
 

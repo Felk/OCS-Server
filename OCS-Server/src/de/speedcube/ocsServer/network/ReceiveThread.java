@@ -41,6 +41,12 @@ public class ReceiveThread extends Thread {
 					receivedBytes += in.read(buffer, receivedBytes, buffer.length - receivedBytes);
 				}
 
+				if (packetID >= Packet.getPacketSize() || packetID < 0) {
+					System.out.println("Client sent invalid packetID, aborting connection.");
+					stopThread();
+					client.stopClient();
+					continue;
+				}
 				Packet receivedPacket = Packet.getPacket(packetID).newInstance();
 				System.out.println("received packet: " + receivedPacket.getName() + " ID: " + receivedPacket.packetID + " (" + (receivedBytes) + " bytes)");
 				receivedPacket.packedData = buffer;

@@ -3,6 +3,9 @@ package de.speedcube.ocsServer.parties;
 import java.util.ArrayList;
 import java.util.Map;
 
+import com.puzzletimer.scramblers.Scrambler;
+import com.puzzletimer.scramblers.ScramblerProvider;
+
 import de.speedcube.ocsServer.User;
 import de.speedcube.ocsServer.Userlist;
 import de.speedcube.ocsUtilities.Config;
@@ -14,6 +17,8 @@ import de.speedcube.ocsUtilities.security.RandomString;
 
 public class Party {
 
+	public static ScramblerProvider scramblerProvider = new ScramblerProvider(); // May take a few seconds!
+	
 	private byte state = PartyStates.OPEN;
 	private int ownerID;
 	private byte type;
@@ -97,8 +102,9 @@ public class Party {
 
 	private void nextRound() {
 		round_num++;
-		// TODO add scrambles
-		rounds[round_num - 1] = new PartyRound(users, "");
+		Scrambler scrambler = Party.scramblerProvider.get(scrambleType);
+		String scramble = (scrambler == null) ? "" : scrambler.getNextScramble().getRawSequence();
+		rounds[round_num - 1] = new PartyRound(users, scramble);
 	}
 
 	private boolean isRoundOver() {

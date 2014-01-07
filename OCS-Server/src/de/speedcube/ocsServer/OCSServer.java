@@ -7,9 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import com.puzzletimer.scramblers.Scrambler;
-import com.puzzletimer.scramblers.ScramblerProvider;
-
 import de.speedcube.ocsServer.autoUpdater.UpdateServerThread;
 import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsServer.network.ServerThread;

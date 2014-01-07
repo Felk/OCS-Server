@@ -7,6 +7,7 @@ import de.speedcube.ocsServer.network.Client;
 import de.speedcube.ocsServer.parties.Party;
 import de.speedcube.ocsServer.sql.OCSDatabase;
 import de.speedcube.ocsUtilities.packets.PacketChannelEnter;
+import de.speedcube.ocsUtilities.packets.PacketChannelLeave;
 import de.speedcube.ocsUtilities.packets.PacketUserInfo;
 import de.speedcube.ocsUtilities.UserInfo;
 
@@ -85,16 +86,18 @@ public class User {
 
 	public void leaveChannel(String channel) {
 		channels.remove(channel);
+		PacketChannelLeave p = new PacketChannelLeave();
+		p.chatChannel = channel;
+		getClient().sendPacket(p);
 		update();
 	}
 
-	public boolean enterChannel(String channel) {
+	public void enterChannel(String channel) {
 		if (!channels.contains(channel)) channels.add(channel);
 		PacketChannelEnter p = new PacketChannelEnter();
 		p.chatChannel = channel;
 		getClient().sendPacket(p);
 		update();
-		return true;
 	}
 
 	public boolean isInChannel(String channel) {
