@@ -19,7 +19,7 @@ import de.speedcube.ocsUtilities.packets.PacketDisconnect;
 
 public class OCSServer {
 
-	public static final String version = "0.85.1";
+	public static final String version = "0.86";
 	public boolean running;
 
 	public ServerThread serverThread;

@@ -23,6 +23,8 @@ public class Party {
 	private int ownerID;
 	private byte type;
 
+	private PartyContainer parties;
+	
 	private int id;
 	private int round_num;
 	private int rounds_num;
@@ -40,7 +42,8 @@ public class Party {
 
 	public final String chatChannel;
 
-	public Party(int id, int ownerID, byte type, int rounds, int counting, String name, Userlist userlist, String scrambleType) {
+	public Party(PartyContainer parties, int id, int ownerID, byte type, int rounds, int counting, String name, Userlist userlist, String scrambleType) {
+		this.parties = parties;
 		this.id = id;
 		this.ownerID = ownerID;
 		this.type = type;
@@ -93,6 +96,7 @@ public class Party {
 			setOver();
 		} else if (isRoundOver && round_num < rounds_num) {
 			nextRound();
+			updateResults();
 		}
 	}
 
@@ -129,10 +133,6 @@ public class Party {
 			int[] times = new int[rounds_num];
 			for (int i = 0; i < rounds.length; i++) {
 				if (rounds[i] == null) {
-					if (i == 0) {
-						times = null;
-						break;
-					}
 					continue;
 				}
 				times[i] = (rounds[i].getTime(user) == null) ? PartyTimeTypes.DNS : rounds[i].getTime(user);
@@ -176,12 +176,13 @@ public class Party {
 		if (!userlist.hasUser(ownerID)) {
 			User u = getNextActiveUser();
 			if (u == null) {
-				userlist.broadcastSystemMessage("party.no_online_owner", chatChannel, true);
+				userlist.broadcastSystemMessage("party.no_online_owner", chatChannel, false);
+				parties.removeParty(this);
 				// TODO problem
 			} else {
 				this.ownerID = u.userInfo.userID;
-				userlist.broadcastSystemMessage("party.owner_changed", chatChannel, true, u.userInfo.username);
-				// TODO owner change
+				userlist.broadcastSystemMessage("party.owner_changed", chatChannel, false, u.userInfo.username);
+				// T/ODO owner change
 			}
 		}
 	}
